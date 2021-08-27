@@ -16,7 +16,9 @@ private StringBuilder baseQuery = new StringBuilder();
 		.append(",a.sap_customer_code__c AS tag_field2 ")
 		.append(",b.propstrength__income_tax_permanent_account_no__c as tag_field4")
 		.append(",b.mailing_city__c as tag_field6")
-		.append(", #{region} AS tag_field8")
+//		.append(", #{region} AS tag_field8")
+		.append(", a.Region__c AS tag_field8")
+		
 		.append(",a.Project_Phases__c as tag_field9")
 		.append(",a.PropStrength__Welcome_Letter_Note__c as tag_field11")
 		.append(",a.Handover_Date__c as tag_field13")

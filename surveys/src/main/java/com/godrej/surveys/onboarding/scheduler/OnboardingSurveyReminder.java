@@ -59,7 +59,7 @@ public class OnboardingSurveyReminder {
 		{
 			/*log.info("sfid {}",dto.getSfid());*/
 			log.info("name {}",dto.getName());
-			contactsList.addAll(surveyService.sendSurveyWithScheduler(dto.getSfid(), null, null,instanceId));
+			contactsList = surveyService.sendSurveyWithScheduler(dto.getSfid(), null, null,instanceId);
 		}
 		//contactsList = surveyService.sendSurveyWithScheduler("a1l6F000008DnniQAC", null, null,instanceId);
 		log.info("Entrys Size: {}",contactsList.size());
