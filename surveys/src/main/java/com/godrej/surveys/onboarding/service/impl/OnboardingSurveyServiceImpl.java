@@ -292,6 +292,7 @@ public class OnboardingSurveyServiceImpl implements OnboardingSurveyService {
 		int totalImportCount = 0;
 		ResponseDto response = new ResponseDto(false, "");
 		updateContactLogs(contacts, instanceId);
+		
 		/*OnboardingSurveyExcelHelper excelHelper = new OnboardingSurveyExcelHelper();
 		excelHelper.tutorialsToExcel(contacts,instanceId);*/
 		return response;
