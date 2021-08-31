@@ -40,8 +40,10 @@ public class RegistrationSurveyRestServiceImpl implements RegistrationSurveyAPIS
 	private APILoggerService apiLoggerService;
 
 	private Logger log = LoggerFactory.getLogger(getClass());
-	private static final String IMPORT_CONTACT_URL = "https://www.questionpro.com/a/api/questionpro.cx.importTransaction?apiKey=";
-	private static final String SEND_REMINDER_URL = "https://www.questionpro.com/a/api/questionpro.cx.sendReminderForEmail?apiKey=";
+	/*private static final String IMPORT_CONTACT_URL = "https://www.questionpro.com/a/api/questionpro.cx.importTransaction?apiKey=";
+	private static final String SEND_REMINDER_URL = "https://www.questionpro.com/a/api/questionpro.cx.sendReminderForEmail?apiKey=";*/
+	private static final String IMPORT_CONTACT_URL = "";
+	private static final String SEND_REMINDER_URL = "";
 	private static final String SURVEY_ID = "7249135";
 	private static final String SMS_TEMPLATE_ID = "163";
 	private static final String INVITATION_TEMPLATE_ID = "519547";
@@ -122,8 +124,8 @@ public class RegistrationSurveyRestServiceImpl implements RegistrationSurveyAPIS
 		request.setSmsTemplateID(SMS_TEMPLATE_ID);
 
 		RegistrationSurveyContactDto contact = new RegistrationSurveyContactDto();
-		contact.setEmail("vivekbirdi@gmail.com");
-		contact.setMobile("917738915689");
+		contact.setUser_email("vivekbirdi@gmail.com");
+		contact.setUser_phone("917738915689");
 		contact.setFirstName("Vivek");
 		contact.setLastName("Birdi");
 		contact.setSegmentCode("S90");

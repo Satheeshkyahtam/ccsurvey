@@ -18,6 +18,7 @@ import com.godrej.surveys.onboarding.dto.OnboardingSurveyContactDto;
 import com.godrej.surveys.onboarding.dto.OnboardingSurveyExcelHelper;
 import com.godrej.surveys.onboarding.service.OnboardingSurveyService;
 import com.godrej.surveys.service.ProjectService;
+import com.godrej.surveys.util.AppConstants;
 
 @Configuration
 public class OnboardingSurveyReminder {
@@ -47,7 +48,7 @@ public class OnboardingSurveyReminder {
         String formatDateTime = now.format(formatter);
         
 //		String instanceId = "All-Onboard"+formatDateTime+"-"+ Calendar.getInstance().getTimeInMillis();
-        String instanceId = "All-Onboard-"+formatDateTime;
+        String instanceId = "GPL-custonboarding-survey-All-Onboard-"+formatDateTime;
 		/*surveyService.sendSurvey(sfid_1, null, null,instanceId);
 		surveyService.sendSurvey(sfid_2, null, null,instanceId);
 		String sfid_3 = "a1l6F000008DnniQAC";*/
@@ -72,7 +73,7 @@ public class OnboardingSurveyReminder {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			springSftpController.sftpcon("D:\\Satheesh\\Projects\\Litmus World\\GPL-custonboarding-survey-"+instanceId+".csv");
+			springSftpController.sftpcon("D:\\Satheesh\\Projects\\Litmus World\\CustOnboard\\"+instanceId+".csv",AppConstants.LW_ONBOARDING_SURVEY_FOLDER_PATH);
 		}
 
 	}

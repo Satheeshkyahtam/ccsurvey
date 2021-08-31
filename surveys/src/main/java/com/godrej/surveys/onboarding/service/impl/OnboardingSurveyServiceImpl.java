@@ -126,11 +126,8 @@ public class OnboardingSurveyServiceImpl implements OnboardingSurveyService {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		/*
-		 * try { surveyRequestDao.clearExtraUpdate(project); }catch (Exception e) {
-		 * log.error(e.getMessage() ,e); }
-		 */		
-		springSftpController.sftpcon("D:\\Satheesh\\Projects\\Litmus World\\GPL-custonboarding-survey-"+instanceId+".csv");
+//		springSftpController.sftpcon("D:\\Satheesh\\Projects\\Litmus World\\GPL-custonboarding-survey-"+instanceId+".csv");
+		springSftpController.sftpcon("D:\\Satheesh\\Projects\\Litmus World\\CustOnboard\\"+instanceId+".csv",AppConstants.LW_ONBOARDING_SURVEY_FOLDER_PATH);
 		return response;
 	}
 	
@@ -174,7 +171,6 @@ public class OnboardingSurveyServiceImpl implements OnboardingSurveyService {
 		 * try { surveyRequestDao.clearExtraUpdate(project); }catch (Exception e) {
 		 * log.error(e.getMessage() ,e); }
 		 */		
-		//springSftpController.sftpcon("D:\\Satheesh\\Projects\\Litmus World\\GPL-custonboarding-survey-"+instanceId+".csv");
 		return contacts;
 	}
 	

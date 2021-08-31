@@ -1,4 +1,4 @@
-package com.godrej.surveys.onboarding.dto;
+package com.godrej.surveys.registration.dto;
 
 import java.io.ByteArrayInputStream;
 import java.io.FileWriter;
@@ -8,21 +8,21 @@ import java.util.List;
 
 import com.opencsv.CSVWriter;
 
-public class OnboardingSurveyExcelHelper {
+public class RegistrationSurveyExcelHelper {
 
-	public static ByteArrayInputStream tutorialsToExcel(List<OnboardingSurveyContactDto> contacts, String instanceId) throws Exception {
+	public static ByteArrayInputStream tutorialsToExcel(List<RegistrationSurveyContactDto> contacts, String instanceId) throws Exception {
 		
 		List<String[]> csvData = createCsvDataForSurvey(contacts);
 
         // default all fields are enclosed in double quotes
         // default separator is a comma
-        try (CSVWriter writer = new CSVWriter(new FileWriter("D:\\Satheesh\\Projects\\Litmus World\\CustOnboard\\"+instanceId+".csv"))) {
+        try (CSVWriter writer = new CSVWriter(new FileWriter("D:\\Satheesh\\Projects\\Litmus World\\Registration\\"+instanceId+".csv"))) {
             writer.writeAll(csvData);
         }
 		return null;
 		
 	}
-	private static List<String[]> createCsvDataForSurvey(List<OnboardingSurveyContactDto> contacts) {
+	private static List<String[]> createCsvDataForSurvey(List<RegistrationSurveyContactDto> contacts) {
         String[] header = { "Touchpoint", "app_id", "user_phone", "transactionDate","user_email","cust_name","name","bookingDate"
   			  ,"sentDate","sentStatus","field1","field2","field3","field4","field6","field8","field9","field10","field11",
   			  "field13","field14","field15","field16","field18","field20","surveyType","propertyName","projectName"};
@@ -31,10 +31,10 @@ public class OnboardingSurveyExcelHelper {
         /*for (OnboardingSurveyContactDto contact : contacts) {
         	 list.add(record1);
         }*/
-        Iterator<OnboardingSurveyContactDto> it = contacts.iterator();
+        Iterator<RegistrationSurveyContactDto> it = contacts.iterator();
 		while (it.hasNext()) {
-			OnboardingSurveyContactDto contact = it.next();
-			list.add(new String[] { "Touchpoint", "givs_touchpoint", contact.getUser_phone(), contact.getTransactionDate(),contact.getUser_email(),contact.getFirstName(),contact.getName(),contact.getBookingDate(),contact.getSentDate(),"FALSE"
+			RegistrationSurveyContactDto contact = it.next();
+			list.add(new String[] { "Touchpoint", "3qwp_touchpoint", contact.getUser_phone(), contact.getTransactionDate(),contact.getUser_email(),contact.getFirstName(),contact.getName(),contact.getBookingDate(),contact.getSentDate(),"FALSE"
 					,contact.getTag_field1(),contact.getTag_field2(),contact.getTag_field3(),contact.getTag_field4(),contact.getTag_field6(),contact.getTag_field8()
 					,contact.getTag_field9(),contact.getTag_field10(),contact.getTag_field11(),contact.getTag_field13(),contact.getTag_field14()
 					,contact.getTag_field15(),contact.getTag_field16(),contact.getTag_field18(),contact.getTag_field20(),contact.getSurveyType(),contact.getPropertyName(),contact.getProjectName()});

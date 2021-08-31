@@ -13,4 +13,6 @@ public interface ProjectService {
 	public ProjectDto getProject(String projectSfid);
 	
 	public List<ProjectDto> getProjectsForScheduler();
+	
+	public List<ProjectDto> getHOProjects(String region);
 }

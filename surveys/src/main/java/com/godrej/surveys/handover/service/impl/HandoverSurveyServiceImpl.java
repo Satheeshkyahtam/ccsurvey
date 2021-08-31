@@ -57,32 +57,82 @@ public class HandoverSurveyServiceImpl implements HandoverSurveyService {
 
 	@Override
 	public List<HandoverSurveyContactDto> getContacts(String projectSfid, String fromDate, String toDate) {
-
+		
+		/* Added by A */
+		try {
+			if (projectSfid != null && !projectSfid.equals("null") && !projectSfid.equals("")) {
+				String [] mf= projectSfid.split(",");
+				ArrayList<HandoverSurveyContactDto> data=new ArrayList<HandoverSurveyContactDto>();
+				
+				for (int i=0;i<mf.length;i++){
+					ProjectDto project = projectService.getProject(mf[i]);
+					
+					if (project != null) {
+						project.setFromDate(fromDate);
+						project.setToDate(toDate);
+						project.setViewOnly("Y");
+						String transactionDate = dateUtil.getCurrentDate("dd/MM/yyyy");
+						project.setTransactionDate(transactionDate);
+						project.setSurveyId("6119246");
+						String instanceId = "Handover_"+ Calendar.getInstance().getTimeInMillis();
+						project.setInstanceId(instanceId);		
+						Integer parkedRecords = surveyRequestDao.parkRecords(project);
+						Integer repeated = contactLogDao.markDuplicate(project);
+						StringBuilder countLog = new StringBuilder();
+						countLog.append("Parked Records count - ").append(parkedRecords)
+						.append(" Repeated Record count - ").append(repeated);
+						log.info(countLog.toString());
+						
+						data.addAll(surveyRequestDao.getContacts(project));
+					}  
+				}
+				return data;
+			} else {
+				return new ArrayList<>();
+			}
+		} catch (Exception e) {
+			log.error(e.getMessage(), e);
+		} 
+		return new ArrayList<>();
+		/* END Added by A */
+		
+		
+		
+		/*
 		ProjectDto project = projectService.getProject(projectSfid);
 		if (project == null) {
 			return new ArrayList<>();
 		}
 		try {
-			project.setFromDate(fromDate);
-			project.setToDate(toDate);
-			project.setViewOnly("Y");
-			String transactionDate = dateUtil.getCurrentDate("dd/MM/yyyy");
-			project.setTransactionDate(transactionDate);
-			project.setSurveyId("6119246");
-			String instanceId = "Handover_"+ Calendar.getInstance().getTimeInMillis();
-			project.setInstanceId(instanceId);		
-			Integer parkedRecords = surveyRequestDao.parkRecords(project);
-			Integer repeated = contactLogDao.markDuplicate(project);
-			StringBuilder countLog = new StringBuilder();
-			countLog.append("Parked Records count - ").append(parkedRecords)
-			.append(" Repeated Record count - ").append(repeated);
-			log.info(countLog.toString());
-
-			return new ArrayList<>(surveyRequestDao.getContacts(project));
+			
+			ArrayList<HandoverSurveyContactDto> data=new ArrayList<HandoverSurveyContactDto>();
+			
+			for(int i=1;i<=2;i++){  
+				project.setFromDate(fromDate);
+				project.setToDate(toDate);
+				project.setViewOnly("Y");
+				String transactionDate = dateUtil.getCurrentDate("dd/MM/yyyy");
+				project.setTransactionDate(transactionDate);
+				project.setSurveyId("6119246");
+				String instanceId = "Handover_"+ Calendar.getInstance().getTimeInMillis();
+				project.setInstanceId(instanceId);		
+				Integer parkedRecords = surveyRequestDao.parkRecords(project);
+				Integer repeated = contactLogDao.markDuplicate(project);
+				StringBuilder countLog = new StringBuilder();
+				countLog.append("Parked Records count - ").append(parkedRecords)
+				.append(" Repeated Record count - ").append(repeated);
+				log.info(countLog.toString());
+				
+				data.addAll(surveyRequestDao.getContacts(project));
+			}
+			System.out.println(data);
+			return data;
+			
+			//return new ArrayList<>(surveyRequestDao.getContacts(project));
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 		}
-		return new ArrayList<>();
+		return new ArrayList<>(); */
 	}
 
 	@Override

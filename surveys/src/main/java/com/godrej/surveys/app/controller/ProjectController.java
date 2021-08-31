@@ -48,4 +48,20 @@ public class ProjectController {
 		return response;
 	}
 
+	/* Added by A */
+	@PostMapping(value="getHOProjectList")
+	public @ResponseBody ResponseDto getHOProjectList(@RequestParam ("region") String region) {
+		ResponseDto response =null;
+		try {
+			List<ProjectDto> projects=projectService.getHOProjects(region);
+			response =  new ResponseDto(false, "");
+			response.addData("projects", projects);
+		}catch (Exception e) {
+			response =  new ResponseDto(true, e.getMessage());
+		}
+		
+		return response;
+	}
+	/* END Added by A */
+
 }
