@@ -33,7 +33,7 @@ public class SpringSftpController {
     private static Path sftpFolder;
     
 	@RequestMapping("/sftpcon")
-    public String sftpcon (@RequestParam("filepath") String filepath){
+    public String sftpcon (@RequestParam("filepath") String filepath,@RequestParam("folderpath") String folderpath){
 		
         try {
         	server = new EmbeddedSftpServerprd();
@@ -52,7 +52,8 @@ public class SpringSftpController {
 	        // Prerequisites
 	        //assertEquals(0, Files.list(sftpFolder).count());
 	        // test phase
-	        gateway.upload(filePathObj.toFile());
+	        System.out.println("Foder Path:-"+folderpath);
+	        gateway.upload(filePathObj.toFile(),folderpath);
 
 	        // Validation phase
 	        List<Path> paths = Files.list(sftpFolder).collect(Collectors.toList());

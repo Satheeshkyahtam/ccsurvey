@@ -18,8 +18,11 @@ import com.godrej.surveys.dto.BookingParam;
 import com.godrej.surveys.dto.ErrorDto;
 import com.godrej.surveys.dto.ProjectDto;
 import com.godrej.surveys.dto.ResponseDto;
+import com.godrej.surveys.onboarding.controller.SpringSftpController;
+import com.godrej.surveys.onboarding.dto.OnboardingSurveyExcelHelper;
 import com.godrej.surveys.registration.dao.RegistrationSurveyRequestDao;
 import com.godrej.surveys.registration.dto.RegistrationSurveyContactDto;
+import com.godrej.surveys.registration.dto.RegistrationSurveyExcelHelper;
 import com.godrej.surveys.registration.dto.RegistrationSurveyReminderContactDto;
 import com.godrej.surveys.registration.dto.RegistrationSurveyReminderResponseDto;
 import com.godrej.surveys.registration.dto.RegistrationSurveyReminderResponseWrapperDto;
@@ -54,6 +57,9 @@ public class RegistrationSurveyServiceImpl implements RegistrationSurveyService 
 	
 	@Autowired
 	private ContactLogDao contactLogDao;
+	
+	@Autowired
+	private SpringSftpController springSftpController;
 
 	@Override
 	public List<RegistrationSurveyContactDto> getContacts(String projectSfid, String fromDate, String toDate) {
@@ -86,7 +92,7 @@ public class RegistrationSurveyServiceImpl implements RegistrationSurveyService 
 	}
 
 	@Override
-	public ResponseDto sendSurvey(String projectSfid, String fromDate, String toDate) {
+	public ResponseDto sendSurvey(String projectSfid, String fromDate, String toDate, String instanceId) {
 		ProjectDto project = projectDao.getProject(projectSfid);
 
 		String preSurveyId= "7249135";
@@ -103,7 +109,6 @@ public class RegistrationSurveyServiceImpl implements RegistrationSurveyService 
 		String transactionDate = dateUtil.getCurrentDate("dd/MM/yyyy");
 		project.setTransactionDate(transactionDate);
 		project.setSurveyId(preSurveyId);
-		String instanceId = "REG_"+ Calendar.getInstance().getTimeInMillis();
 		project.setInstanceId(instanceId);		
 		Integer parkedRecords = surveyRequestDao.parkRecords(project);
 		Integer repeated = contactLogDao.markDuplicate(project);
@@ -119,7 +124,46 @@ public class RegistrationSurveyServiceImpl implements RegistrationSurveyService 
 		 * try { surveyRequestDao.clearExtraUpdate(project); }catch (Exception e) {
 		 * log.error(e.getMessage() ,e); }
 		 */
+		springSftpController.sftpcon("D:\\Satheesh\\Projects\\Litmus World\\Registration\\"+instanceId+".csv",AppConstants.LW_REGISTRATION_SURVEY_FOLDER_PATH);
 		return response;
+	}
+	
+	@Override
+	public List<RegistrationSurveyContactDto> sendSurveyWithScheduler(String projectSfid, String fromDate, String toDate, String instanceId) {
+		ProjectDto project = projectDao.getProject(projectSfid);
+
+		String preSurveyId= "7249135";
+		if (project == null) {
+
+			StringBuilder errorMsg = new StringBuilder("No project found for sfid - ");
+			errorMsg.append(projectSfid);
+			log.error(errorMsg.toString());
+			//return new ResponseDto(true, "No project found for sfid- " + projectSfid);
+			return null;
+		}
+		project.setFromDate(fromDate);
+		project.setToDate(toDate);
+		project.setViewOnly("N");
+		String transactionDate = dateUtil.getCurrentDate("dd/MM/yyyy");
+		project.setTransactionDate(transactionDate);
+		project.setSurveyId(preSurveyId);
+		project.setInstanceId(instanceId);		
+		Integer parkedRecords = surveyRequestDao.parkRecords(project);
+		Integer repeated = contactLogDao.markDuplicate(project);
+		StringBuilder countLog = new StringBuilder();
+		countLog.append("Parked Records count - ").append(parkedRecords)
+		.append(" Repeated Record count - ").append(repeated);
+		log.info(countLog.toString());
+
+		List<RegistrationSurveyContactDto> contacts = new ArrayList<>(surveyRequestDao.getContacts(project));
+		ResponseDto response =  processSurvey(contacts, project);
+		
+		/*
+		 * try { surveyRequestDao.clearExtraUpdate(project); }catch (Exception e) {
+		 * log.error(e.getMessage() ,e); }
+		 */
+		//springSftpController.sftpcon("D:\\Satheesh\\Projects\\Litmus World\\Registration\\"+instanceId+".csv",AppConstants.LW_REGISTRATION_SURVEY_FOLDER_PATH);
+		return contacts;
 	}
 	
 	@SuppressWarnings("unused")
@@ -157,13 +201,30 @@ public class RegistrationSurveyServiceImpl implements RegistrationSurveyService 
 		return response;
 
 	}
+	private ResponseDto processSurveyWithScheduler(List<RegistrationSurveyContactDto> contacts, ProjectDto project) {
+		ResponseDto response = processSurveyWithScheduler(contacts, project.getInstanceId());
+		Integer statusUpdateCount = updateStatus(project);
+		response.addData("statusUpdateCount", statusUpdateCount);
+		return response;
+
+	}
 
 	private ResponseDto processSurvey(List<RegistrationSurveyContactDto> contacts, String instanceId) {
 
 		if (CommonUtil.isCollectionEmpty(contacts)) {
 			return new ResponseDto(true, "No contact for project ");
 		}
+		int totalImportCount = 0;
 		ResponseDto response = new ResponseDto(false, "");
+		//updateContactLogs(contacts, instanceId);
+		RegistrationSurveyExcelHelper excelHelper = new RegistrationSurveyExcelHelper();
+		try {
+			excelHelper.tutorialsToExcel(contacts,instanceId);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		/*ResponseDto response = new ResponseDto(false, "");
 		int pageSize = AppConstants.SURVEY_API_PAGE_SIZE;
 		int totalImportCount = 0;
 		if (contacts.size() <= pageSize) {
@@ -201,10 +262,27 @@ public class RegistrationSurveyServiceImpl implements RegistrationSurveyService 
 				updateContactLogs(contactChunck, instanceId);
 			}
 			startIndex = i * pageSize;
-		}
+		}*/
 		return response;
 	}
 	
+	private ResponseDto processSurveyWithScheduler(List<RegistrationSurveyContactDto> contacts, String instanceId) {
+
+		if (CommonUtil.isCollectionEmpty(contacts)) {
+			return new ResponseDto(true, "No contact for project ");
+		}
+		int totalImportCount = 0;
+		ResponseDto response = new ResponseDto(false, "");
+		//updateContactLogs(contacts, instanceId);
+		RegistrationSurveyExcelHelper excelHelper = new RegistrationSurveyExcelHelper();
+		try {
+			excelHelper.tutorialsToExcel(contacts,instanceId);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return response;
+	}
 	private Integer updateContactLogs(List<RegistrationSurveyContactDto> contactChunck, String instanceId) {
 		String[] bookings = contactChunck.stream().map(contact -> contact.getName()).collect(Collectors.toList())
 				.toArray(new String[0]);

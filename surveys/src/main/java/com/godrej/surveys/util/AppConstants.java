@@ -26,5 +26,22 @@ public final class AppConstants {
 	public static final DateTimeFormatter DEFAULT_DATE_FORMATTER = DateTimeFormatter.ofPattern(DEFAULT_DATE_FORMAT); 
 	public static final boolean TEST_ENV=false;
 	public static final int SURVEY_API_PAGE_SIZE=500;
+	
+	
+	public static final String LW_SFTP_HOST="";
+	public static final String LW_SFTP_USERNAME="";
+	
+	public static final String LW_ONBOARDING_SURVEY_FOLDER_PATH="/home/godrej_properties/litmus/feedbacks/customer_onboarding_survey/incoming";
+	public static final String LW_REGISTRATION_SURVEY_FOLDER_PATH="/home/godrej_properties/litmus/feedbacks/registration_survey/incoming";
+	public static final String LW_HANDOVER_SURVEY_FOLDER_PATH="/home/godrej_properties/litmus/feedbacks/handover_survey/incoming";
+	
+	public static final String LW_APP_ID_ONBOARDING="givs_touchpoint";
+	public static final String LW_APP_ID_REGISTRATION="3qwp_touchpoint";
+	public static final String LW_APP_ID_HANDOVER="ivhh_touchpoint";
+	
+	public static final String LW_TOUCHPOINT="Touchpoint";
+	
+	
+	
 
 }

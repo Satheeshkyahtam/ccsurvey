@@ -31,9 +31,6 @@ public class OnboardingSurveyAdminContoller {
 	@Autowired
 	private OnboardingSurveyService surveyService;
 	
-	@Autowired
-	private SpringSftpController springSftpController;
-	
 	@GetMapping(value = "/pr/surveyAdminONB")
 	public ModelAndView openSurveyAdminPage() {
 		ModelAndView view = new ModelAndView();
@@ -63,12 +60,8 @@ public class OnboardingSurveyAdminContoller {
 			LocalDateTime now = LocalDateTime.now();
 	        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss");
 	        String formatDateTime = now.format(formatter);
-	        
-//			String instanceId = "PRwise-Onboard"+ Calendar.getInstance().getTimeInMillis();
-	        String instanceId = "PRwise-Onboard-"+formatDateTime;
+	        String instanceId = "GPL-custonboarding-survey-PRwise-Onboard-"+formatDateTime;
 			response = surveyService.sendSurvey(projectSfid,null,null,instanceId);
-//			springSftpController.sftpcon("D:\\Satheesh\\Projects\\Litmus World\\GPL-custonboarding-survey-"+instanceId+".csv");
-//			response =  new ResponseDto(true, "Not activated Yet");
 		}catch (Exception e) {
 			log.error("Error", e);
 			response =  new ResponseDto(true, "Problem while sending Survey");
