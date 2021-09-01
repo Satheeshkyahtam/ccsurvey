@@ -61,7 +61,6 @@ public class RegistrationSurveyAdminContoller {
 			LocalDateTime now = LocalDateTime.now();
 	        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss");
 	        String formatDateTime = now.format(formatter);
-	        
 	        String instanceId = "GPL-registration-survey-PRwise-Onboard-"+formatDateTime;
 			response = surveyService.sendSurvey(projectSfid,null,null,instanceId);
 //			response =  new ResponseDto(true, "Not activated Yet");

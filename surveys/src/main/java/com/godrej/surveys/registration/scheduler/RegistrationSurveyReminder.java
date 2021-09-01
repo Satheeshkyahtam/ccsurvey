@@ -37,14 +37,15 @@ public class RegistrationSurveyReminder {
 	private SpringSftpController springSftpController;
 		
 	 //@Scheduled(cron = "0 55 11 * * *") 
-	@Scheduled(cron = "0 0/2 * * * ?")
+	/*@Scheduled(cron = "0 0/2 * * * ?")*/
+	@Scheduled(cron = "0 15 09 * * ?")
 	public void survey() {
 		if(log.isInfoEnabled()) {
 			log.info("%s %s","Survey Onboarding - ", Calendar.getInstance().getTime());
 		}
-		String sfid_1 = "a1l6F000002dTpoQAE";
+		/*String sfid_1 = "a1l6F000002dTpoQAE";
 		String sfid_2 = "a1l6F000008fqcuQAA";
-		String sfid_3 = "a1l6F000008DnniQAC";
+		String sfid_3 = "a1l6F000008DnniQAC";*/
 		LocalDateTime now = LocalDateTime.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss");
         String formatDateTime = now.format(formatter);
@@ -52,15 +53,15 @@ public class RegistrationSurveyReminder {
 		/*surveyService.sendSurvey(sfid_3, null, null,instanceId);
 		surveyService.sendSurvey(sfid_1, null, null);
 		surveyService.sendSurvey(sfid_2, null, null);*/
-		List<ProjectDto> projectList =  projectService.getProjectsForScheduler();
+		//String dateWhereCondition="and Customer_Onboard_Survey_Start_Date__c::date < now()::date and Customer_Onboard_Survey_Start_Date__c is not null"
+		String dateWhereCondition=" and Agreement_Survey_Start_Date__c::date < now()::date and Agreement_Survey_Start_Date__c is not null";
+		List<ProjectDto> projectList =  projectService.getProjectsForScheduler(dateWhereCondition);
 		List<RegistrationSurveyContactDto> contactsList = new ArrayList<RegistrationSurveyContactDto>();
 		for(ProjectDto dto:projectList)
 		{
-			/*log.info("sfid {}",dto.getSfid());*/
 			log.info("name {}",dto.getName());
 			contactsList = surveyService.sendSurveyWithScheduler(dto.getSfid(), null, null,instanceId);
 		}
-		//contactsList = surveyService.sendSurveyWithScheduler("a1l6F000008DnniQAC", null, null,instanceId);
 		log.info("Entrys Size: {}",contactsList.size());
 		if(contactsList.size()>0)
 		{
