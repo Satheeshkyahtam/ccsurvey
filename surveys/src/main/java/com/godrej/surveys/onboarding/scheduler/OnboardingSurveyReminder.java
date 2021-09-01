@@ -35,7 +35,7 @@ public class OnboardingSurveyReminder {
 	private SpringSftpController springSftpController;
 	
 	 /*@Scheduled(cron = "0 01 12 * * *") every day 12:00 pm*/
-	@Scheduled(cron = "0 0 09 * * ?")  /*every day 09:00 am  */
+	/*@Scheduled(cron = "0 0 09 * * ?")*/  /*every day 09:00 am  */
 	/*@Scheduled(cron = "0 0/2 * * * ?") */
 	public void survey() {
 		if(log.isInfoEnabled()) {

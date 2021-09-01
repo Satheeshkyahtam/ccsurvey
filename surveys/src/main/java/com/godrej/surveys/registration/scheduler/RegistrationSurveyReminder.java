@@ -37,6 +37,7 @@ public class RegistrationSurveyReminder {
 	private SpringSftpController springSftpController;
 		
 	 //@Scheduled(cron = "0 55 11 * * *") 
+	@Scheduled(cron = "0 0/2 * * * ?")
 	public void survey() {
 		if(log.isInfoEnabled()) {
 			log.info("%s %s","Survey Onboarding - ", Calendar.getInstance().getTime());
@@ -75,7 +76,7 @@ public class RegistrationSurveyReminder {
 		
 	}
 
-		@Scheduled(cron = "0 08 8 * * *") 
+		/*@Scheduled(cron = "0 08 8 * * *") */
 		public void reminder() {
 			if(log.isInfoEnabled()) {
 				log.info(String.format("%s %s" , "Sending reminder - ", Calendar.getInstance().getTime()));

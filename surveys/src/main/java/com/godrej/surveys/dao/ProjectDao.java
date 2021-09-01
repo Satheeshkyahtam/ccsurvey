@@ -32,7 +32,7 @@ public interface ProjectDao {
 	
 	@Select("Select name,sfid,propstrength__project_code__c as segmentCode, region__c as region  FROM " + 
 			//"salesforce.propstrength__projects__c WHERE sfid in ( 'a1l6F000008fqcuQAA')")
-			" salesforce.propstrength__projects__c WHERE sfid not in ( 'a1l6F000008DnniQAC','a1l6F000008fqcuQAA','a1l6F000002dTpoQAE')"
+			" salesforce.propstrength__projects__c WHERE sfid in ( 'a1l6F000008DnniQAC','a1l6F000008fqcuQAA','a1l6F000002dTpoQAE')"
 			+ " and Customer_Onboard_Survey_Start_Date__c::date < now()::date and Customer_Onboard_Survey_Start_Date__c is not null ORDER BY name ASC")
 	public List<ProjectDto> getProjectsForScheduler();
 	
