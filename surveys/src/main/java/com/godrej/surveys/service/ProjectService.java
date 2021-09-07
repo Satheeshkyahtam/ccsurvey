@@ -15,4 +15,6 @@ public interface ProjectService {
 	public List<ProjectDto> getProjectsForScheduler(String dateWhereCondition);
 	
 	public List<ProjectDto> getHOProjects(String region);
+	
+	public List<ProjectDto> getBLProjects(String region);
 }

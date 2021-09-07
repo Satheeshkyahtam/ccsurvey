@@ -45,4 +45,13 @@ public interface ProjectDao {
 			+ " ORDER BY name ASC")
 	public List<ProjectDto> getHOProjects(String region);
 	/* END Added by A */
+	
+	/* Added by A */
+	@Select("Select name,sfid,propstrength__project_code__c as segmentCode, region__c as region  FROM " + 
+			//"salesforce.propstrength__projects__c WHERE sfid not in ( 'a1l6F000008DnniQAC','a1l6F000008fqcuQAA','a1l6F000002dTpoQAE') "
+			"salesforce.propstrength__projects__c WHERE sfid not in ('a1l6F000008fqcuQAA','a1l6F000002dTpoQAE') "
+			//+ " and Baseline_Survey_Start_Date__c::date < now()::date and Baseline_Survey_Start_Date__c is not null "
+			+ " ORDER BY name ASC")
+	public List<ProjectDto> getBLProjects(String region);
+	/* END Added by A */
 }
