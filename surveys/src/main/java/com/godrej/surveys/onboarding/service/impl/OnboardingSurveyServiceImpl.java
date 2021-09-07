@@ -126,7 +126,6 @@ public class OnboardingSurveyServiceImpl implements OnboardingSurveyService {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-//		springSftpController.sftpcon("D:\\Satheesh\\Projects\\Litmus World\\GPL-custonboarding-survey-"+instanceId+".csv");
 		springSftpController.sftpcon("D:\\Satheesh\\Projects\\Litmus World\\CustOnboard\\"+instanceId+".csv",AppConstants.LW_ONBOARDING_SURVEY_FOLDER_PATH);
 		return response;
 	}
@@ -288,9 +287,6 @@ public class OnboardingSurveyServiceImpl implements OnboardingSurveyService {
 		int totalImportCount = 0;
 		ResponseDto response = new ResponseDto(false, "");
 		updateContactLogs(contacts, instanceId);
-		
-		/*OnboardingSurveyExcelHelper excelHelper = new OnboardingSurveyExcelHelper();
-		excelHelper.tutorialsToExcel(contacts,instanceId);*/
 		return response;
 	}
 	private Integer updateContactLogs(List<OnboardingSurveyContactDto> contactChunck, String instanceId) {

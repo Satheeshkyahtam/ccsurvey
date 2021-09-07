@@ -60,8 +60,12 @@ public class BaselineSurveySQLProvider {
 	public final String getBasicWhereClause() {
 		StringBuilder whereClause = new StringBuilder();
 		 whereClause.append(" WHERE A.propstrength__project__c=#{sfid} ")
-			.append(" AND A.propstrength__booking_date__c BETWEEN to_date(#{fromDate},'dd-mm-yyyy') AND to_date(#{toDate},'dd-mm-yyyy') ")
-			.append("AND A.propstrength__active__c=true AND ")
+			
+			/* Date condition commented by A */
+		 	.append(" AND A.propstrength__booking_date__c BETWEEN to_date(#{fromDate},'dd-mm-yyyy') AND to_date(#{toDate},'dd-mm-yyyy') ")
+		 	/* END Date condition commented by A */
+		 
+		 	.append("AND A.propstrength__active__c=true AND ")
 			.append(" a.dnd__c= false ")
 			.append("  AND a.propstrength__status__c= 'Deal Approved'")
 			.append(" AND (a.customer_status__c IS NULL OR ")

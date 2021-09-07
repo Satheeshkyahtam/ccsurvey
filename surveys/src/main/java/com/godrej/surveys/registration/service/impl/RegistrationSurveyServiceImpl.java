@@ -156,13 +156,7 @@ public class RegistrationSurveyServiceImpl implements RegistrationSurveyService 
 		log.info(countLog.toString());
 
 		List<RegistrationSurveyContactDto> contacts = new ArrayList<>(surveyRequestDao.getContacts(project));
-		ResponseDto response =  processSurvey(contacts, project);
-		
-		/*
-		 * try { surveyRequestDao.clearExtraUpdate(project); }catch (Exception e) {
-		 * log.error(e.getMessage() ,e); }
-		 */
-		//springSftpController.sftpcon("D:\\Satheesh\\Projects\\Litmus World\\Registration\\"+instanceId+".csv",AppConstants.LW_REGISTRATION_SURVEY_FOLDER_PATH);
+		ResponseDto response =  processSurveyWithScheduler(contacts, project);
 		return contacts;
 	}
 	
@@ -216,7 +210,7 @@ public class RegistrationSurveyServiceImpl implements RegistrationSurveyService 
 		}
 		int totalImportCount = 0;
 		ResponseDto response = new ResponseDto(false, "");
-		//updateContactLogs(contacts, instanceId);
+		updateContactLogs(contacts, instanceId);
 		RegistrationSurveyExcelHelper excelHelper = new RegistrationSurveyExcelHelper();
 		try {
 			excelHelper.tutorialsToExcel(contacts,instanceId);
@@ -273,7 +267,7 @@ public class RegistrationSurveyServiceImpl implements RegistrationSurveyService 
 		}
 		int totalImportCount = 0;
 		ResponseDto response = new ResponseDto(false, "");
-		//updateContactLogs(contacts, instanceId);
+		updateContactLogs(contacts, instanceId);
 		RegistrationSurveyExcelHelper excelHelper = new RegistrationSurveyExcelHelper();
 		try {
 			excelHelper.tutorialsToExcel(contacts,instanceId);

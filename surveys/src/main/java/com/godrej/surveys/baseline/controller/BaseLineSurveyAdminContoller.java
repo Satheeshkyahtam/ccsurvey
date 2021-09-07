@@ -1,6 +1,9 @@
 package com.godrej.surveys.baseline.controller;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -14,12 +17,17 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.godrej.surveys.baseline.dto.BaselineSurveyContactDto;
+import com.godrej.surveys.baseline.dto.BaselineSurveyExcelHelper;
 import com.godrej.surveys.baseline.dto.BaselineSurveyReminderContactDto;
 import com.godrej.surveys.baseline.service.BaselineSurveyAPIService;
 import com.godrej.surveys.baseline.service.BaselineSurveyService;
 import com.godrej.surveys.dto.ProjectDto;
 import com.godrej.surveys.dto.ResponseDto;
+import com.godrej.surveys.onboarding.controller.SpringSftpController;
+import com.godrej.surveys.onboarding.dto.OnboardingSurveyContactDto;
+import com.godrej.surveys.onboarding.dto.OnboardingSurveyExcelHelper;
 import com.godrej.surveys.service.ProjectService;
+import com.godrej.surveys.util.AppConstants;
 
 @Controller
 public class BaseLineSurveyAdminContoller {
@@ -35,6 +43,9 @@ public class BaseLineSurveyAdminContoller {
 	@Autowired
 	private BaselineSurveyService rmSurveyService;
 	
+	@Autowired
+	private SpringSftpController springSftpController;
+	
 	@GetMapping(value = "/pr/surveyAdminBL")
 	public ModelAndView openSurveyAdminPage() {
 		ModelAndView view = new ModelAndView();
@@ -49,8 +60,9 @@ public class BaseLineSurveyAdminContoller {
 	}
 
 	@PostMapping("/pr/getContactsBL")
-	public @ResponseBody ResponseDto getContacts(@RequestParam("projectSfid") String projectSfid,
-			@RequestParam("fromDate") String fromDate, @RequestParam("toDate") String toDate) {
+	public @ResponseBody ResponseDto getContacts(@RequestParam("projectSfid") String projectSfid, @RequestParam("fromDate") String fromDate, @RequestParam("toDate") String toDate) {
+			//@RequestParam("fromDate") String fromDate, @RequestParam("toDate") String toDate) {
+		//List<BaselineSurveyContactDto> contacts =  rmSurveyService.getContacts(projectSfid, fromDate, toDate);
 		List<BaselineSurveyContactDto> contacts =  rmSurveyService.getContacts(projectSfid, fromDate, toDate);
 		ResponseDto response = new ResponseDto(false, "");
 		response.addData("contacts", contacts);
@@ -63,7 +75,13 @@ public class BaseLineSurveyAdminContoller {
 			,@RequestParam ("fromDate") String fromDate, @RequestParam("toDate") String toDate) {
 		ResponseDto response = null;
 		try {
-			response = rmSurveyService.sendSurvey(projectSfid,fromDate,toDate);
+			LocalDateTime now = LocalDateTime.now();
+	        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss");
+	        String formatDateTime = now.format(formatter);
+	        
+	        String instanceId = "Baseline_"+formatDateTime;
+	        
+			response = rmSurveyService.sendSurvey(projectSfid,fromDate,toDate, instanceId);
 		}catch (Exception e) {
 			log.error("Error", e);
 			response =  new ResponseDto(true, "Problem while sending Survey");
@@ -124,5 +142,54 @@ public class BaseLineSurveyAdminContoller {
 	public @ResponseBody String sendReminder() {
 		rmSurveyService.sendReminderToAllRegions();
 		return "OK";
+	}
+	 
+	@PostMapping("/pr/sendMultiProjectSurveyBL")
+	public @ResponseBody String sendMultiProjectSurveyBL(@RequestParam("projectSfid") String projectSfid, @RequestParam("fromDate") String fromDate, @RequestParam("toDate") String toDate) {
+		
+		if(log.isInfoEnabled()) {
+			log.info("%s %s","Baseline_", Calendar.getInstance().getTime());
+		}
+		LocalDateTime now = LocalDateTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss");
+        String formatDateTime = now.format(formatter);
+        
+        String instanceId = "GPL-baseline-survey-All-Onboard-"+formatDateTime;
+		
+		//List<ProjectDto> projectList =  projectService.getProjectsForScheduler();
+		List<BaselineSurveyContactDto> contactsList = new ArrayList<BaselineSurveyContactDto>();
+		
+		if (projectSfid != null && !projectSfid.equals("null") && !projectSfid.equals("")) {
+			String [] mf= projectSfid.split(",");
+			
+			for (int i=0;i<mf.length;i++){
+				log.info("name {}",mf[i]);
+				//contactsList = surveyService.sendSurveyWithScheduler(dto.getSfid(), null, null,instanceId);
+				contactsList = rmSurveyService.sendMultiSurvey(mf[i],fromDate, toDate,instanceId);
+				
+				System.out.println("BL SEND Survey : " + mf[i] + " " + i);
+			}
+			
+		}	
+		
+		/*for(ProjectDto dto:projectList) {
+			log.info("name {}",dto.getName());
+			//contactsList = surveyService.sendSurveyWithScheduler(dto.getSfid(), null, null,instanceId);
+			contactsList = rmSurveyService.sendMultiSurvey(projectSfid,null,null,instanceId);
+		}*/
+		log.info("Entrys Size: {}",contactsList.size());
+		if(contactsList.size()>0)
+		{
+			BaselineSurveyExcelHelper excelHelper = new BaselineSurveyExcelHelper();
+			try {
+				excelHelper.tutorialsToExcel(contactsList,instanceId);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			springSftpController.sftpcon("D:\\Satheesh\\Projects\\Litmus World\\Baseline\\"+instanceId+".csv",AppConstants.LW_BASELINE_SURVEY_FOLDER_PATH);
+		}
+		
+		return "";
 	}
 }

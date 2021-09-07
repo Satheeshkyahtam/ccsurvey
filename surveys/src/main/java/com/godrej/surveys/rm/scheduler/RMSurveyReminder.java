@@ -10,7 +10,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 
 import com.godrej.surveys.rm.service.RMSurveyService;
 
-@Configuration
+//@Configuration
 public class RMSurveyReminder {
 
 	private Logger log = LoggerFactory.getLogger(getClass());

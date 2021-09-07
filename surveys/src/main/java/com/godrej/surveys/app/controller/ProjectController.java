@@ -63,5 +63,21 @@ public class ProjectController {
 		return response;
 	}
 	/* END Added by A */
+	
+	/* Added by A */
+	@PostMapping(value="getBLProjectList")
+	public @ResponseBody ResponseDto getBLProjectList(@RequestParam ("region") String region) {
+		ResponseDto response =null;
+		try {
+			List<ProjectDto> projects=projectService.getBLProjects(region);
+			response =  new ResponseDto(false, "");
+			response.addData("projects", projects);
+		}catch (Exception e) {
+			response =  new ResponseDto(true, e.getMessage());
+		}
+		
+		return response;
+	}
+	/* END Added by A */
 
 }

@@ -52,10 +52,10 @@ public class ProjectServiceImpl implements ProjectService {
 	}
 
 	@Override
-	public List<ProjectDto> getProjectsForScheduler() {
+	public List<ProjectDto> getProjectsForScheduler(String dateWhereCondition) {
 		// TODO Auto-generated method stub
 		try {
-			return projectDao.getProjectsForScheduler();
+			return projectDao.getProjectsForScheduler(dateWhereCondition);
 		}catch (Exception e) {
 			log.error("Error",e);
 		}

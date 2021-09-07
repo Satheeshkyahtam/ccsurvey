@@ -41,8 +41,8 @@ public class OnboardingSurveyReminder {
 		if(log.isInfoEnabled()) {
 			log.info("%s %s","Survey Onboarding - ", Calendar.getInstance().getTime());
 		}
-		String sfid_1 = "a1l6F000002dTpoQAE";
-		String sfid_2 = "a1l6F000008fqcuQAA";
+		/*String sfid_1 = "a1l6F000002dTpoQAE";
+		String sfid_2 = "a1l6F000008fqcuQAA";*/
 		LocalDateTime now = LocalDateTime.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss");
         String formatDateTime = now.format(formatter);
@@ -53,8 +53,8 @@ public class OnboardingSurveyReminder {
 		surveyService.sendSurvey(sfid_2, null, null,instanceId);
 		String sfid_3 = "a1l6F000008DnniQAC";*/
 		//surveyService.sendSurvey(null, null, null,instanceId);
-		
-		List<ProjectDto> projectList =  projectService.getProjectsForScheduler();
+        String dateWhereCondition=" and Customer_Onboard_Survey_Start_Date__c::date < now()::date and Customer_Onboard_Survey_Start_Date__c is not null";
+		List<ProjectDto> projectList =  projectService.getProjectsForScheduler(dateWhereCondition);
 		List<OnboardingSurveyContactDto> contactsList = new ArrayList<OnboardingSurveyContactDto>();
 		for(ProjectDto dto:projectList)
 		{

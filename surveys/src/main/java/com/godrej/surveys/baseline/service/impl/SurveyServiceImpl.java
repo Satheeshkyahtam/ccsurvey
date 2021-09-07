@@ -28,6 +28,7 @@ import com.godrej.surveys.dto.BookingParam;
 import com.godrej.surveys.dto.ErrorDto;
 import com.godrej.surveys.dto.ProjectDto;
 import com.godrej.surveys.dto.ResponseDto;
+import com.godrej.surveys.onboarding.dto.OnboardingSurveyContactDto;
 import com.godrej.surveys.service.ProjectService;
 import com.godrej.surveys.util.AppConstants;
 import com.godrej.surveys.util.CommonUtil;
@@ -57,9 +58,38 @@ public class SurveyServiceImpl implements BaselineSurveyService {
 	private ContactLogDao contactLogDao;
 
 	@Override
-	public List<BaselineSurveyContactDto> getContacts(String projectSfid, String fromDate, String toDate) {
-
-		ProjectDto project = projectService.getProject(projectSfid);
+	//public List<BaselineSurveyContactDto> getContacts(String projectSfid, String fromDate, String toDate) {
+	public List<BaselineSurveyContactDto> getContacts(String projectSfid, String fromDate, String toDate) {	
+		
+		/* Added by A */
+		try {
+			if (projectSfid != null && !projectSfid.equals("null") && !projectSfid.equals("")) {
+				String [] mf= projectSfid.split(",");
+				ArrayList<BaselineSurveyContactDto> data=new ArrayList<BaselineSurveyContactDto>();
+				
+				for (int i=0;i<mf.length;i++){
+					ProjectDto project = projectService.getProject(mf[i]);
+					
+					if (project != null) {
+						project.setFromDate(fromDate);
+						project.setToDate(toDate);
+						
+						data.addAll(surveyRequestDao.getContacts(project));
+						System.out.println("BL : " + project + " " + i);
+					}  
+				}
+				return data;
+			} else {
+				return new ArrayList<>();
+			}
+		} catch (Exception e) {
+			log.error(e.getMessage(), e);
+		} 
+		return new ArrayList<>();
+		/* END Added by A */
+		
+		
+		/*ProjectDto project = projectService.getProject(projectSfid);
 		if (project == null) {
 			return new ArrayList<>();
 		}
@@ -70,12 +100,12 @@ public class SurveyServiceImpl implements BaselineSurveyService {
 		} catch (Exception e) {
 			log.error("Error", e);
 		}
-		return new ArrayList<>();
+		return new ArrayList<>();*/
 	}
 
 	@Override
 //	@Transactional(propagation = Propagation.REQUIRED)
-	public ResponseDto sendSurvey(String projectSfid, String fromDate, String toDate) {
+	public ResponseDto sendSurvey(String projectSfid, String fromDate, String toDate, String instanceId) {
 		ProjectDto project = projectDao.getProject(projectSfid);
 
 		String preSurveyId= "6356212";
@@ -95,7 +125,7 @@ public class SurveyServiceImpl implements BaselineSurveyService {
 		project.setSurveyId(preSurveyId);
 		
 		project.setSurveyId(preSurveyId);
-		String instanceId = "Baseline_"+ Calendar.getInstance().getTimeInMillis();
+		instanceId = "Baseline_"+ Calendar.getInstance().getTimeInMillis();
 		project.setInstanceId(instanceId);		
 		Integer parkedRecords = surveyRequestDao.parkRecords(project);
 		Integer repeated = contactLogDao.markDuplicate(project);
@@ -170,8 +200,18 @@ public class SurveyServiceImpl implements BaselineSurveyService {
 	}
 
 	private ResponseDto processSurvey(List<BaselineSurveyContactDto> contacts,String type, String instanceId) {
-
+		
+		/* Added by A */
 		if (CommonUtil.isCollectionEmpty(contacts)) {
+			return new ResponseDto(true, "No contact for project ");
+		}
+		ResponseDto response = new ResponseDto(false, "");
+		updateContactLogs(contacts, instanceId);
+		
+		return response;
+		/* END Added by A */
+		
+		/*if (CommonUtil.isCollectionEmpty(contacts)) {
 			return new ResponseDto(true, "No contact for project ");
 		}
 		ResponseDto response = new ResponseDto(false, "");
@@ -213,7 +253,7 @@ public class SurveyServiceImpl implements BaselineSurveyService {
 			}
 			startIndex = i * pageSize;
 		}
-		return response;
+		return response;*/
 	}
 
 	private Integer updateContactLogs(List<BaselineSurveyContactDto> contactChunck, String instanceId) {
@@ -411,5 +451,68 @@ public class SurveyServiceImpl implements BaselineSurveyService {
 			log.error("Error", e);
 		}
 		return new HashSet<>();
+	}
+	
+	
+	@Override
+//	@Transactional(propagation = Propagation.REQUIRED)
+	public List<BaselineSurveyContactDto> sendMultiSurvey(String projectSfid, String fromDate, String toDate, String instanceId) {
+		ProjectDto project = projectDao.getProject(projectSfid);
+
+		String preSurveyId= "6356212";
+		String postSurveyId= "6356217";
+		if (project == null) {
+
+			StringBuilder errorMsg = new StringBuilder("No project found for sfid - ");
+			errorMsg.append(projectSfid);
+			log.error(errorMsg.toString());
+			//return new ResponseDto(true, "No project found for sfid- " + projectSfid);
+			//return null;
+		}
+		project.setFromDate(fromDate);
+		project.setToDate(toDate);
+
+		String transactionDate = dateUtil.getCurrentDate("dd/MM/yyyy");
+		project.setTransactionDate(transactionDate);
+		project.setSurveyId(preSurveyId);
+		
+		project.setSurveyId(preSurveyId);
+		//String instanceId = "Baseline_"+ Calendar.getInstance().getTimeInMillis();
+		project.setInstanceId(instanceId);		
+		Integer parkedRecords = surveyRequestDao.parkRecords(project);
+		Integer repeated = contactLogDao.markDuplicate(project);
+		StringBuilder countLog = new StringBuilder();
+		countLog.append("Parked Records count - ").append(parkedRecords)
+		.append(" Repeated Record count - ").append(repeated);
+		log.info(countLog.toString());
+
+
+		/*List<BaselineSurveyContactDto> contacts = new ArrayList<>(surveyRequestDao.getPrePossessionParkedContacts(project));
+		ResponseDto responsePre =  processSurvey(contacts, project, "PRE");
+		
+		project.setSurveyId(postSurveyId);
+		contacts = new ArrayList<>(surveyRequestDao.getPostPossessionParkedContacts(project));
+		ResponseDto responsePost =  processSurvey(contacts, project, "POST");
+		
+		try {
+			 getFinalResponse(responsePre, responsePost);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}*/
+		
+		List<BaselineSurveyContactDto> contacts = new ArrayList<>(surveyRequestDao.getContacts(project));
+		
+		ResponseDto response=null;
+		try {
+			response = processSurvey(contacts, project, null);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
+		return contacts;
+		//return getFinalResponse(responsePre, responsePost);
 	}
 }
