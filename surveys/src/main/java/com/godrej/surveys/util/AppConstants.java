@@ -44,6 +44,12 @@ public final class AppConstants {
 	public static final String LW_TOUCHPOINT="Touchpoint";
 	
 	
+	public static final String SFDC_USERNAME = "appadmin@godrejproperties.com";
+	public static final String SFDC_PASSWORD= "apiadmin@2019VNfEJzl43L7Mar6a6EHSRBqvs";
+	public static final String SFDC_LOGINURL= "https://godrej.my.salesforce.com";
+	public static final String SFDC_GRANTSERVICE= "/services/oauth2/token?grant_type=password";
+	public static final String SFDC_CLIENTID = "3MVG9Y6d_Btp4xp7lt5FL02Cc.VrY2x6HA5K.VU9tuKI0QMM6fkndLpgKvlJbsP4IM_1M5Pi_7E51res6e6Hd";
+	public static final String SFDC_CLIENTSECRET = "2B6529FF8055727D581688C832A68204937E06BF4791D5363C76F5821D8739FB";
 	
-
+	public static final String SFDC_UPDATEBASELINESURVEY = "https://godrej.my.salesforce.com/services/apexrest/api/UpdateBaselineSurveyField";
 }

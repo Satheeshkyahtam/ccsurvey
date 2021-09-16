@@ -15,7 +15,7 @@ public class BaselineSurveySQLProvider {
 	
 	public BaselineSurveySQLProvider() {
 				
-		baseQuery.append("SELECT a.propstrength__applicant_email__c as email,a.rm_name__c field20 ")
+		baseQuery.append("SELECT a.sfid, a.propstrength__applicant_email__c as email,a.rm_name__c field20 ")
 		.append(",a.propstrength__applicant_mobile__c as mobile, ")
 		.append("a.propstrength__primary_applicant_name__c as firstName, '' as lastName")
 		.append(",a.propstrength__booking_date__c dateOfBooking")
@@ -71,7 +71,11 @@ public class BaselineSurveySQLProvider {
 			.append(" AND (a.customer_status__c IS NULL OR ")
 //			.append(" A.customer_status__c NOT IN ('Legal Case','Voluntary Cancellation Request Received','Pre-termination sent','Termination sent','Registration Termination') )")
 			/* Changed by Satheesh K*/
-			.append(" A.customer_status__c NOT IN ('Legal Case') )")
+			//.append(" A.customer_status__c NOT IN ('Legal Case') )")
+
+			.append(" A.customer_status__c NOT IN ('Pre-termination sent', 'Termination sent', 'Voluntary Cancellation Request Received', 'Legal Case', 'Registration Termination' ) )")
+			
+			
 			.append(" AND a.propstrength__applicant_email__c is not null ")
 			.append(" AND a.Baseline_Survey_Sent__c <> true ");
 		return whereClause.toString();
@@ -100,7 +104,40 @@ public class BaselineSurveySQLProvider {
 		.append("	name,segmentCode ,transactionDate , field1 ,field15 ,field2 ,field4 ,field6 ,")
 		.append("	field8 ,field9 ,field11 ,field13 ,field14, field16 ,surveyType ,propertyName ,") 
 		.append("	field3,field18 ,field7,instance_id ,created_on,survey ) ")
-		.append(getContactSQL());	
+		
+		//.append(getContactSQL());	
+		
+		.append("SELECT a.propstrength__applicant_email__c as email,a.rm_name__c field20 ")
+		.append(",a.propstrength__applicant_mobile__c as mobile, ")
+		.append("a.propstrength__primary_applicant_name__c as firstName, '' as lastName")
+		.append(",a.propstrength__booking_date__c dateOfBooking")
+		.append(",to_char(a.propstrength__booking_date__c,'dd-mm-yyyy') bookingDate ")
+		.append(",a.name, #{segmentCode} as segmentCode ")
+		.append(", #{transactionDate} as transactionDate ")
+		.append(",a.propstrength__property_name__c as field1,Project_Name__c as field15 ")
+		.append(",a.sap_customer_code__c AS field2 ")
+		.append(",b.propstrength__income_tax_permanent_account_no__c as field4")
+		.append(",b.mailing_city__c as field6")
+		.append(", #{region} AS field8")
+		.append(",a.Project_Phases__c as field9")
+		.append(",a.PropStrength__Welcome_Letter_Note__c as field11")
+		.append(",a.Handover_Date__c as field13")
+		.append(",a.SiteVisitOtherThanHandoverReceivedDate__c as field14")
+		.append(",b.FirstName as field16")
+		.append(",CASE WHEN a.handover_date__c IS NULL THEN 'PRE_POSSESSION' ") 
+		.append(" ELSE 'POST_POSSESSION' END AS surveyType")
+		.append(",propstrength__property_name__c AS propertyName")
+		.append(",'ECRM' AS field3, #{surveyId} as field18 ")
+		.append(", handover_done_by__c as field7 ")
+		.append(",#{instanceId} as instance_id ")
+		.append(", now() as created_on ")
+		.append(", #{name} as survey ")
+		
+		.append(" FROM salesforce.propstrength__application_booking__c a ")
+	    .append(" INNER JOIN salesforce.contact b on (a.propstrength__primary_customer__c =b.sfid)")
+		
+	    .append(getBasicWhereClause());
+		
 		return query.toString();
 	}
 	

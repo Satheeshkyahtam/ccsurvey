@@ -23,4 +23,8 @@ public interface ContactLogDao {
 	@UpdateProvider(type = ContactLogSQLProvider.class, method = "updateSentContactsQuery")
 	public Integer updateSentContacts(@Param("bookingParam") BookingParam bookingParam);
 	
+	/* Added by A */
+	@UpdateProvider(type = ContactLogSQLProvider.class, method = "updateBaselineSentContactsQuery")
+	public Integer updateBaselineSentContacts(@Param("bookingParam") BookingParam bookingParam);
+	/* END Added by A */
 }

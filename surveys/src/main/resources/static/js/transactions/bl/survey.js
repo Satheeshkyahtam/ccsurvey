@@ -6,6 +6,9 @@ $(document).ready(function (){
 });
 
 function onClickSendSurvey(){
+	
+	$('#blNoteMsg').show();
+	
 	$("#sendSurvey").attr('disabled',true);
 	var projectSfid = $("#projectList").find(':selected').val();
 	//sendSurvey(projectSfid);
@@ -53,16 +56,21 @@ function sendSurvey(projectSfid){
 }
 
 function processSurveyResponse(response){
+	
+	$("#sendSurvey").attr('disabled',false);
+	
 	if(response ==null){
 		return;
 	}
 	if(response.hasError){
 		alert(response.message);
+		return;
 	}else if(response.data==null){
 		alert("No Import information");
+		return;
 	}
 	else{
 		alert("Import Count = " +response.data.importCount);
 	}
-	$("#sendSurvey").attr('disabled',false);
+	alert ("Your request has been sent successfully");
 }

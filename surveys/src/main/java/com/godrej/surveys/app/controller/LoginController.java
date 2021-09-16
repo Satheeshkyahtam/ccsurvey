@@ -34,10 +34,20 @@ public class LoginController {
 	@PostMapping(value = "/authenticate")
 	public @ResponseBody ResponseDto loginuser(LoginUserDto dto) {
 		ResponseDto response = null;
-		if(dto.getEmail().equals("prakash.idnani@godrejproperties.com") || dto.getEmail().equals("sparikh@godrejproperties.com") || dto.getEmail().equals("rajesh.gupta@godrejproperties.com") 
+		if(dto.getEmail().equals("shruti.tawade@litmusworld.com") || dto.getEmail().equals("prakash.idnani@godrejproperties.com") || dto.getEmail().equals("sparikh@godrejproperties.com") || dto.getEmail().equals("rajesh.gupta@godrejproperties.com") 
 				|| dto.getEmail().equals("prashant.jain@godrejinds.com") || dto.getEmail().equals("ve.swaminathan@godrejinds.com") 
 				|| dto.getEmail().equals("sathish.kyatham@godrejinds.com") || dto.getEmail().equals("vineet.bhardwaj@godrejproperties.com") || dto.getEmail().equals("sachin.suryavanshi@godrejproperties.com"))
 		{
+			String ccsurveysEmailID = "shruti.tawade@litmusworld.com";
+			String ccsurveysPass = "ccsurvey@2021";
+			
+			if(dto.getEmail().equals(ccsurveysEmailID) && dto.getPassword().equals(ccsurveysPass)) {
+				response =  new ResponseDto(false, "Login Successfull");
+				response.addData("principal", dto);
+				return response;
+						
+			}
+			
 			
 			if(AppConstants.TEST_ENV) {
 				response =  new ResponseDto(false, "Login Successfull");

@@ -166,6 +166,8 @@ public class LdapLoginServiceImpl implements LoginService {
 		LdapLoginServiceImpl service =  new LdapLoginServiceImpl();
 		service.init();
 		
+		System.out.println("Test");
+		
 		service.getldapUserData(login);
 	}
 }

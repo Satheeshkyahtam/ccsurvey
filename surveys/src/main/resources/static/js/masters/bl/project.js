@@ -206,6 +206,8 @@ function populateProjects(response){
 		
 		var html = '';
 		var touchpointID = '';
+		
+		var surveyID = '';
 
 		$.each(contacts, function(key, entry){
 			/*$('#surveyContactTable tbody').append('<tr><td>'+entry.firstName+'</td><td>'
@@ -219,11 +221,17 @@ function populateProjects(response){
 			if (entry.surveyType != undefined && entry.surveyType != null && entry.surveyType != 'null') {
 				if (entry.surveyType == "PRE_POSSESSION") {
 					touchpointID = 'ntp4_touchpoint';
+					surveyID = '6356212';
 				} else if (entry.surveyType == "POST_POSSESSION") {
 					touchpointID = 'epn8_touchpoint';
+					surveyID = '6356217';
+				} else {
+					touchpointID = '';
+					surveyID = '';
 				}
 			} else {
 				touchpointID = '';
+				surveyID = '';
 			}
 			
 			/*Added by A*/
@@ -251,7 +259,7 @@ function populateProjects(response){
 				+'<td>'+entry.field14+'</td>' 
 				+'<td>'+entry.field15+'</td>' 
 				+'<td>'+entry.field16+'</td>' 
-				+'<td>'+entry.field18+'</td>' 
+				+'<td>'+surveyID+'</td>' 
 				+'<td>'+entry.field20+'</td>' 
 				+'<td>'+entry.surveyType+'</td>' 
 				+'<td>'+entry.propertyName+'</td>' 

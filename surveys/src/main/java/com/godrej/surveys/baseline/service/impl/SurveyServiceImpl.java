@@ -7,11 +7,14 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.godrej.surveys.baseline.controller.UpdateBaselineSurveyField;
 import com.godrej.surveys.baseline.dao.BaselineSurveyRequestDao;
 import com.godrej.surveys.baseline.dto.BaselineBookingParam;
 import com.godrej.surveys.baseline.dto.BaselineSurveyContactDto;
@@ -28,9 +31,7 @@ import com.godrej.surveys.dto.BookingParam;
 import com.godrej.surveys.dto.ErrorDto;
 import com.godrej.surveys.dto.ProjectDto;
 import com.godrej.surveys.dto.ResponseDto;
-import com.godrej.surveys.onboarding.dto.OnboardingSurveyContactDto;
 import com.godrej.surveys.service.ProjectService;
-import com.godrej.surveys.util.AppConstants;
 import com.godrej.surveys.util.CommonUtil;
 import com.godrej.surveys.util.DateUtil;
 
@@ -181,8 +182,46 @@ public class SurveyServiceImpl implements BaselineSurveyService {
 	}
 
 	private ResponseDto processSurvey(List<BaselineSurveyContactDto> contacts, ProjectDto project,String type) {
+		
+		Boolean updateFalg = false;
+		String apiResult = null;
+		
+		try {
+			apiResult = UpdateBaselineSurveyField.updateBaselineData(contacts);
+			
+			if (apiResult != null && !apiResult.equals("")) {
+				
+				JSONObject obj = new JSONObject(apiResult);
+		        String flag = obj.get("Sucess").toString();
+		        String bookingDtl = obj.get("bookings").toString();
+		        
+	        	if (flag.equals("true")) {
+	        		updateFalg = true; 
+	        		
+	        		JSONArray jsonArr = new JSONArray(bookingDtl);
+	                for (int i = 0; i < jsonArr.length(); i++) {
+	                     JSONObject jsonObj = jsonArr.getJSONObject(i);
+	                     if (jsonObj.get("updated").equals("false")) {
+	                    	 updateFalg = false;
+	                    	 break;
+	                     }
+	                }
+	        	} else {
+	        		updateFalg = false;
+	        	}
+			}  
+			
+		} catch (Exception e) {
+			updateFalg = false;
+			apiResult = "UpdateBaselineSurveyField - API execution error"; 
+		}
+		
+		if (updateFalg) {
+			apiResult = "";
+		}
+		
 		ResponseDto response = new ResponseDto(); 
-		processSurvey(contacts, type, project.getInstanceId());
+		processSurvey(contacts, type, project.getInstanceId(), updateFalg, apiResult);
 		Integer statusUpdateCount = updateStatus(project,type);
 		
 		/*
@@ -195,18 +234,18 @@ public class SurveyServiceImpl implements BaselineSurveyService {
 		 * updateStatus(contacts);
 		 */
 		response.addData("statusUpdateCount", statusUpdateCount);
+		
 		return response;
-
 	}
 
-	private ResponseDto processSurvey(List<BaselineSurveyContactDto> contacts,String type, String instanceId) {
+	private ResponseDto processSurvey(List<BaselineSurveyContactDto> contacts,String type, String instanceId, Boolean apiFlag, String apiRes) {
 		
 		/* Added by A */
 		if (CommonUtil.isCollectionEmpty(contacts)) {
 			return new ResponseDto(true, "No contact for project ");
 		}
 		ResponseDto response = new ResponseDto(false, "");
-		updateContactLogs(contacts, instanceId);
+		updateContactLogs(contacts, instanceId, apiFlag, apiRes);
 		
 		return response;
 		/* END Added by A */
@@ -256,14 +295,16 @@ public class SurveyServiceImpl implements BaselineSurveyService {
 		return response;*/
 	}
 
-	private Integer updateContactLogs(List<BaselineSurveyContactDto> contactChunck, String instanceId) {
+	private Integer updateContactLogs(List<BaselineSurveyContactDto> contactChunck, String instanceId, Boolean apiFlag, String apiRes) {
 		String[] bookings = contactChunck.stream().map(contact -> contact.getName()).collect(Collectors.toList())
 				.toArray(new String[0]);
 		BookingParam bookingParam = new BookingParam();
 		bookingParam.setBookings(bookings);
 		bookingParam.setInstanceId(instanceId);
+		bookingParam.setApiFlag(apiFlag);
+		bookingParam.setApiRes(apiRes);
 		try {
-			contactLogDao.updateSentContacts(bookingParam);
+			contactLogDao.updateBaselineSentContacts(bookingParam);
 		}catch (Exception e) {
 			log.error(e.getMessage(),e);
 		}
@@ -292,7 +333,7 @@ public class SurveyServiceImpl implements BaselineSurveyService {
 		try {
 			Integer updatedContacts = contactLogDao.markContactLogs(project);
 			log.info(project.getInstanceId() + " Contact logs marked count - " + updatedContacts);
-			return surveyRequestDao.updateStatusFromContactLogs(project);
+			//return surveyRequestDao.updateStatusFromContactLogs(project);
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 		}

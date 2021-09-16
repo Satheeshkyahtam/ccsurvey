@@ -58,4 +58,39 @@ public class ContactLogSQLProvider {
 			query.append(" )");
 		return query.toString();
 	}
+	
+	/* Added by A */
+	public String updateBaselineSentContactsQuery(Map<String,BookingParam> params) {
+		BookingParam bookingParam = params.get("param1");
+		String []bookings = bookingParam.getBookings();
+		String instanceId = bookingParam.getInstanceId();
+		
+		Boolean apiFlag = bookingParam.getApiFlag();
+		String apiRes = bookingParam.getApiRes(); 
+		
+		StringBuilder query =  new StringBuilder();
+		query.append("UPDATE rmsurvey.g_contacts a SET ") 
+		.append(" survey_sent_date= now(), apisucess = ")
+		
+		.append(apiFlag)
+		.append(",")
+		.append(" apierrormsg = '")
+		.append(apiRes)
+		.append("'")
+		
+		.append(" WHERE instance_id = '") 
+		.append(instanceId)
+		.append("' AND a.name IN ("); 
+			for(int i = 0;i<bookingParam.getBookings().length; i++) {
+				if (i > 0) {
+					query.append(',');
+			    }
+				query.append("'").append(bookings[i]);
+				query.append("'");
+			}
+			query.append(" )");
+		return query.toString();
+	}
+	/* END Added by A */
+	
 }
