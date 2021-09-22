@@ -77,7 +77,11 @@ public class BaselineSurveySQLProvider {
 			
 			
 			.append(" AND a.propstrength__applicant_email__c is not null ")
-			.append(" AND a.Baseline_Survey_Sent__c <> true ");
+			.append(" AND a.Baseline_Survey_Sent__c <> true ")
+		 
+			.append(" ORDER BY A.propstrength__booking_date__c ");
+		 
+		 
 		return whereClause.toString();
 	}
 
