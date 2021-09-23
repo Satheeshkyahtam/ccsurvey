@@ -22,7 +22,7 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 @Configuration
 @MapperScan("com.godrej.**.dao")
-//@EnableScheduling
+@EnableScheduling
 @EnableSwagger2
 public class AppConfig implements WebMvcConfigurer{
 

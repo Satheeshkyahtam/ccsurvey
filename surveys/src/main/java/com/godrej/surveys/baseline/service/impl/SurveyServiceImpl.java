@@ -7,11 +7,14 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.godrej.surveys.baseline.controller.UpdateBaselineSurveyField;
 import com.godrej.surveys.baseline.dao.BaselineSurveyRequestDao;
 import com.godrej.surveys.baseline.dto.BaselineBookingParam;
 import com.godrej.surveys.baseline.dto.BaselineSurveyContactDto;
@@ -29,7 +32,6 @@ import com.godrej.surveys.dto.ErrorDto;
 import com.godrej.surveys.dto.ProjectDto;
 import com.godrej.surveys.dto.ResponseDto;
 import com.godrej.surveys.service.ProjectService;
-import com.godrej.surveys.util.AppConstants;
 import com.godrej.surveys.util.CommonUtil;
 import com.godrej.surveys.util.DateUtil;
 
@@ -57,9 +59,38 @@ public class SurveyServiceImpl implements BaselineSurveyService {
 	private ContactLogDao contactLogDao;
 
 	@Override
-	public List<BaselineSurveyContactDto> getContacts(String projectSfid, String fromDate, String toDate) {
-
-		ProjectDto project = projectService.getProject(projectSfid);
+	//public List<BaselineSurveyContactDto> getContacts(String projectSfid, String fromDate, String toDate) {
+	public List<BaselineSurveyContactDto> getContacts(String projectSfid, String fromDate, String toDate) {	
+		
+		/* Added by A */
+		try {
+			if (projectSfid != null && !projectSfid.equals("null") && !projectSfid.equals("")) {
+				String [] mf= projectSfid.split(",");
+				ArrayList<BaselineSurveyContactDto> data=new ArrayList<BaselineSurveyContactDto>();
+				
+				for (int i=0;i<mf.length;i++){
+					ProjectDto project = projectService.getProject(mf[i]);
+					
+					if (project != null) {
+						project.setFromDate(fromDate);
+						project.setToDate(toDate);
+						
+						data.addAll(surveyRequestDao.getContacts(project));
+						System.out.println("BL : " + project + " " + i);
+					}  
+				}
+				return data;
+			} else {
+				return new ArrayList<>();
+			}
+		} catch (Exception e) {
+			log.error(e.getMessage(), e);
+		} 
+		return new ArrayList<>();
+		/* END Added by A */
+		
+		
+		/*ProjectDto project = projectService.getProject(projectSfid);
 		if (project == null) {
 			return new ArrayList<>();
 		}
@@ -70,12 +101,12 @@ public class SurveyServiceImpl implements BaselineSurveyService {
 		} catch (Exception e) {
 			log.error("Error", e);
 		}
-		return new ArrayList<>();
+		return new ArrayList<>();*/
 	}
 
 	@Override
 //	@Transactional(propagation = Propagation.REQUIRED)
-	public ResponseDto sendSurvey(String projectSfid, String fromDate, String toDate) {
+	public ResponseDto sendSurvey(String projectSfid, String fromDate, String toDate, String instanceId) {
 		ProjectDto project = projectDao.getProject(projectSfid);
 
 		String preSurveyId= "6356212";
@@ -95,7 +126,7 @@ public class SurveyServiceImpl implements BaselineSurveyService {
 		project.setSurveyId(preSurveyId);
 		
 		project.setSurveyId(preSurveyId);
-		String instanceId = "Baseline_"+ Calendar.getInstance().getTimeInMillis();
+		instanceId = "Baseline_"+ Calendar.getInstance().getTimeInMillis();
 		project.setInstanceId(instanceId);		
 		Integer parkedRecords = surveyRequestDao.parkRecords(project);
 		Integer repeated = contactLogDao.markDuplicate(project);
@@ -151,8 +182,46 @@ public class SurveyServiceImpl implements BaselineSurveyService {
 	}
 
 	private ResponseDto processSurvey(List<BaselineSurveyContactDto> contacts, ProjectDto project,String type) {
+		
+		Boolean updateFalg = false;
+		String apiResult = null;
+		
+		try {
+			apiResult = UpdateBaselineSurveyField.updateBaselineData(contacts);
+			
+			if (apiResult != null && !apiResult.equals("")) {
+				
+				JSONObject obj = new JSONObject(apiResult);
+		        String flag = obj.get("Sucess").toString();
+		        String bookingDtl = obj.get("bookings").toString();
+		        
+	        	if (flag.equals("true")) {
+	        		updateFalg = true; 
+	        		
+	        		JSONArray jsonArr = new JSONArray(bookingDtl);
+	                for (int i = 0; i < jsonArr.length(); i++) {
+	                     JSONObject jsonObj = jsonArr.getJSONObject(i);
+	                     if (jsonObj.get("updated").equals("false")) {
+	                    	 updateFalg = false;
+	                    	 break;
+	                     }
+	                }
+	        	} else {
+	        		updateFalg = false;
+	        	}
+			}  
+			
+		} catch (Exception e) {
+			updateFalg = false;
+			apiResult = "UpdateBaselineSurveyField - API execution error"; 
+		}
+		
+		if (updateFalg) {
+			apiResult = "";
+		}
+		
 		ResponseDto response = new ResponseDto(); 
-		processSurvey(contacts, type, project.getInstanceId());
+		processSurvey(contacts, type, project.getInstanceId(), updateFalg, apiResult);
 		Integer statusUpdateCount = updateStatus(project,type);
 		
 		/*
@@ -165,13 +234,23 @@ public class SurveyServiceImpl implements BaselineSurveyService {
 		 * updateStatus(contacts);
 		 */
 		response.addData("statusUpdateCount", statusUpdateCount);
+		
 		return response;
-
 	}
 
-	private ResponseDto processSurvey(List<BaselineSurveyContactDto> contacts,String type, String instanceId) {
-
+	private ResponseDto processSurvey(List<BaselineSurveyContactDto> contacts,String type, String instanceId, Boolean apiFlag, String apiRes) {
+		
+		/* Added by A */
 		if (CommonUtil.isCollectionEmpty(contacts)) {
+			return new ResponseDto(true, "No contact for project ");
+		}
+		ResponseDto response = new ResponseDto(false, "");
+		updateContactLogs(contacts, instanceId, apiFlag, apiRes);
+		
+		return response;
+		/* END Added by A */
+		
+		/*if (CommonUtil.isCollectionEmpty(contacts)) {
 			return new ResponseDto(true, "No contact for project ");
 		}
 		ResponseDto response = new ResponseDto(false, "");
@@ -213,17 +292,19 @@ public class SurveyServiceImpl implements BaselineSurveyService {
 			}
 			startIndex = i * pageSize;
 		}
-		return response;
+		return response;*/
 	}
 
-	private Integer updateContactLogs(List<BaselineSurveyContactDto> contactChunck, String instanceId) {
+	private Integer updateContactLogs(List<BaselineSurveyContactDto> contactChunck, String instanceId, Boolean apiFlag, String apiRes) {
 		String[] bookings = contactChunck.stream().map(contact -> contact.getName()).collect(Collectors.toList())
 				.toArray(new String[0]);
 		BookingParam bookingParam = new BookingParam();
 		bookingParam.setBookings(bookings);
 		bookingParam.setInstanceId(instanceId);
+		bookingParam.setApiFlag(apiFlag);
+		bookingParam.setApiRes(apiRes);
 		try {
-			contactLogDao.updateSentContacts(bookingParam);
+			contactLogDao.updateBaselineSentContacts(bookingParam);
 		}catch (Exception e) {
 			log.error(e.getMessage(),e);
 		}
@@ -252,7 +333,7 @@ public class SurveyServiceImpl implements BaselineSurveyService {
 		try {
 			Integer updatedContacts = contactLogDao.markContactLogs(project);
 			log.info(project.getInstanceId() + " Contact logs marked count - " + updatedContacts);
-			return surveyRequestDao.updateStatusFromContactLogs(project);
+			//return surveyRequestDao.updateStatusFromContactLogs(project);
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 		}
@@ -411,5 +492,68 @@ public class SurveyServiceImpl implements BaselineSurveyService {
 			log.error("Error", e);
 		}
 		return new HashSet<>();
+	}
+	
+	
+	@Override
+//	@Transactional(propagation = Propagation.REQUIRED)
+	public List<BaselineSurveyContactDto> sendMultiSurvey(String projectSfid, String fromDate, String toDate, String instanceId) {
+		ProjectDto project = projectDao.getProject(projectSfid);
+
+		String preSurveyId= "6356212";
+		String postSurveyId= "6356217";
+		if (project == null) {
+
+			StringBuilder errorMsg = new StringBuilder("No project found for sfid - ");
+			errorMsg.append(projectSfid);
+			log.error(errorMsg.toString());
+			//return new ResponseDto(true, "No project found for sfid- " + projectSfid);
+			//return null;
+		}
+		project.setFromDate(fromDate);
+		project.setToDate(toDate);
+
+		String transactionDate = dateUtil.getCurrentDate("dd/MM/yyyy");
+		project.setTransactionDate(transactionDate);
+		project.setSurveyId(preSurveyId);
+		
+		project.setSurveyId(preSurveyId);
+		//String instanceId = "Baseline_"+ Calendar.getInstance().getTimeInMillis();
+		project.setInstanceId(instanceId);		
+		Integer parkedRecords = surveyRequestDao.parkRecords(project);
+		Integer repeated = contactLogDao.markDuplicate(project);
+		StringBuilder countLog = new StringBuilder();
+		countLog.append("Parked Records count - ").append(parkedRecords)
+		.append(" Repeated Record count - ").append(repeated);
+		log.info(countLog.toString());
+
+
+		/*List<BaselineSurveyContactDto> contacts = new ArrayList<>(surveyRequestDao.getPrePossessionParkedContacts(project));
+		ResponseDto responsePre =  processSurvey(contacts, project, "PRE");
+		
+		project.setSurveyId(postSurveyId);
+		contacts = new ArrayList<>(surveyRequestDao.getPostPossessionParkedContacts(project));
+		ResponseDto responsePost =  processSurvey(contacts, project, "POST");
+		
+		try {
+			 getFinalResponse(responsePre, responsePost);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}*/
+		
+		List<BaselineSurveyContactDto> contacts = new ArrayList<>(surveyRequestDao.getContacts(project));
+		
+		ResponseDto response=null;
+		try {
+			response = processSurvey(contacts, project, null);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
+		return contacts;
+		//return getFinalResponse(responsePre, responsePost);
 	}
 }

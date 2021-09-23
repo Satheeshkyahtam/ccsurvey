@@ -44,6 +44,8 @@ public class BaselineSurveyContactDto extends BaseDto{
 	private String field10;
 	private String field18;
 	
+	private String sfid;
+	
 	public String getFirstName() {
 		return firstName;
 	}
@@ -230,6 +232,13 @@ public class BaselineSurveyContactDto extends BaseDto{
 	}
 	public void setField18(String field18) {
 		this.field18 = field18;
+	}
+	
+	public String getSfid() {
+		return sfid;
+	}
+	public void setSfid(String sfid) {
+		this.sfid = sfid;
 	}
 	@Override
 	public int hashCode() {

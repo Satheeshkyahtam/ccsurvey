@@ -75,4 +75,17 @@ public class ProjectServiceImpl implements ProjectService {
 		return new ArrayList<>();
 	}
 	/* END Added by A */
+	
+	/* Added by A */
+	@Override
+	public List<ProjectDto> getBLProjects(String region) {
+		try{
+			/*return projectDao.getProjectsTest();*/
+			 return projectDao.getBLProjects(region); 
+		}catch (Exception e) {
+			log.error("Error", e);
+		}
+		return new ArrayList<>();
+	}
+	/* END Added by A */
 }

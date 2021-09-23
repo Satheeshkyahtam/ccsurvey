@@ -12,6 +12,10 @@
 <link rel="stylesheet" href="<c:url value='/css/common/datatable.css' />">
 <link rel="stylesheet" href="<c:url value='/css/common/button.datatable.css' />">
 
+<link rel="stylesheet" href="<c:url value='/vendor/multiselectDD/prettify.min.css'/>">
+<link rel="stylesheet" href="<c:url value='/vendor/multiselectDD/bootstrap-multiselect.css'/>">
+
+
 <script src="<c:url value='/js/common/jquery.min.js' />"></script>
 <script src="<c:url value='/js/common/bootstrap.min.js' />"></script>
 <script src="<c:url value='/js/masters/bl/project.js' />"></script>
@@ -108,7 +112,7 @@
 		<div role="tabpanel" class="tab-pane active" id="home">
 			<div class="filterColBg">
 				<div class="filterCol">
-				  <div class="form-group col-md-2">
+				  <%-- <div class="form-group col-md-2">
 					<label >Region</label>
 					<select class="form-control input-sm" name="region" id="regionList">
 					<option selected value="0">Choose Region</option>
@@ -116,11 +120,11 @@
 						<option value="${region}">${region}</option>
 					</c:forEach>
 					</select>
-				  </div>
+				  </div> --%>
 				  
 				  <div class="form-group col-md-2">
 					<label >Projects</label>
-					<select class="form-control input-sm" name="projectSfid" id="projectList">				
+					<select class="form-control input-sm multiselectDD" name="projectSfid" id="projectList" multiple="multiple" style="height:34px;">				
 					</select>
 				  </div>
 				  <div class="form-group col-md-2">
@@ -145,14 +149,16 @@
 					<label style="display: block;"> &nbsp; </label>
 					<button class="btn btn-primary btn-sm" id="sendSurvey">Send Survey</button>
 				  </div> 
+				  <div class="clearfix"></div> 
+				  <div id="blNoteMsg" style="display:none; padding: 0 15px 5px 15px; color: #b10101; ">To process the all project records, it might take a few minutes</div>
 				  <div class="clearfix"></div>
 				</div>
 				<div class="clearfix"></div>
 			</div>
-	<div class="container-fluid">
+	<div class="container-fluid" style="overflow: auto;">
 			<table class="display nowrap table table-bordred" style="width:100%" id="surveyContactTable">
 				<thead>
-				  <tr>
+				  <!-- <tr>
 					<th>Firstname</th>
 					<th>Email</th>
 					<th>Mobile</th>
@@ -161,7 +167,40 @@
 					<th>Type</th>
 					<th>Project</th>
 					<th>Unit</th>
+				  </tr> -->
+				  
+				  <!-- Added by A -->
+				  <tr>
+					<th>Touchpoint</th>
+					<th>app_id</th>
+					<th>user_phone</th>
+					<th>transactionDate</th>
+					<th>user_email</th>
+					<th>cust_name</th>
+					<th>name</th>
+					<th>bookingDate</th>
+					<th>sentDate</th>
+					<th>sentStatus</th>
+					<th>field1</th>
+					<th>field2</th>
+					<th>field3</th>
+					<th>field4</th>
+					<th>field6</th>
+					<th>field8</th>
+					<th>field9</th>
+					<th>field10</th>
+					<th>field11</th>
+					<th>field13</th>
+					<th>field14</th>
+					<th>field15</th>
+					<th>field16</th>
+					<th>field18</th>
+					<th>field20</th>
+					<th>surveyType</th>
+					<th>propertyName</th>
+					<th>projectName</th>
 				  </tr>
+				  <!-- END Added by A -->
 				</thead>
 				<tbody id="suveyContacts">
 				</tbody>
@@ -376,5 +415,9 @@
 	    } );
 	} ); */
 	</script>
+	
+	<script src="<c:url value='/vendor/multiselectDD/prettify.min.js'/>"></script>
+	<script src="<c:url value='/vendor/multiselectDD/bootstrap-multiselect.js'/>"></script>	
+	
 </body>
 </html>                                		                            
