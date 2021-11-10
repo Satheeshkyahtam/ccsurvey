@@ -20,7 +20,7 @@ public class BaselineSurveyReminder {
 	@Autowired
 	private BaselineSurveyService baselineSurveyService;
 		
-	 @Scheduled(cron = "0 34 10 * * *") 
+	 /*@Scheduled(cron = "0 34 10 * * *")*/ 
 	public void firstReminder() {
 		if(log.isInfoEnabled()) {
 			log.info("%s %s","Reminders - ", Calendar.getInstance().getTime());
