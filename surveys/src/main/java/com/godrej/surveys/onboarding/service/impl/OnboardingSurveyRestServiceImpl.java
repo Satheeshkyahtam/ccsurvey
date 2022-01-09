@@ -148,7 +148,7 @@ public class OnboardingSurveyRestServiceImpl implements OnboardingSurveyAPIServi
 		contact.setUser_phone("919987677726");
 		/*contact.setFirstName("Vivek");
 		contact.setLastName("Birdi");*/
-		contact.setName("Satheesh Kyatham");
+		contact.setName("Vivek Birdi");
 		contact.setSegmentCode("S90");
 		contact.setTransactionDate("12/12/2019");
 

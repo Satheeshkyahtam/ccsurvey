@@ -35,11 +35,12 @@ public final class AppConstants {
 	public static final String LW_REGISTRATION_SURVEY_FOLDER_PATH="/home/godrej_properties/litmus/feedbacks/registration_survey/incoming";
 	public static final String LW_HANDOVER_SURVEY_FOLDER_PATH="/home/godrej_properties/litmus/feedbacks/handover_survey/incoming";
 	public static final String LW_BASELINE_SURVEY_FOLDER_PATH="/home/godrej_properties/litmus/feedbacks/half_yearly_survey/incoming";
-
+	public static final String LW_SITEVIST_SURVEY_FOLDER_PATH="/home/godrej_properties/litmus/feedbacks/site_visit_survey/incoming";
 	
 	public static final String LW_APP_ID_ONBOARDING="givs_touchpoint";
 	public static final String LW_APP_ID_REGISTRATION="3qwp_touchpoint";
 	public static final String LW_APP_ID_HANDOVER="ivhh_touchpoint";
+	public static final String LW_APP_ID_SITEVISIT="mxfz_touchpoint";
 	
 	public static final String LW_TOUCHPOINT="Touchpoint";
 	

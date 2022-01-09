@@ -16,7 +16,8 @@ public interface HandoverSurveyService {
 
 	public Set<HandoverSurveyReminderContactDto> getContactsForSecondReminder(ProjectDto project);
 
-	public ResponseDto sendSurvey(String projectSfid, String fromDate, String toDate);
+	public ResponseDto sendSurvey(String projectSfid, String fromDate, String toDate,String instanceId);
+	public List<HandoverSurveyContactDto> sendSurveyWithScheduler(String projectSfid, String fromDate, String toDate, String instanceId);
 
 	public ResponseDto sendReminder(ProjectDto project);
 

@@ -18,9 +18,11 @@ import com.godrej.surveys.dto.BookingParam;
 import com.godrej.surveys.dto.ErrorDto;
 import com.godrej.surveys.dto.ProjectDto;
 import com.godrej.surveys.dto.ResponseDto;
+import com.godrej.surveys.onboarding.controller.SpringSftpController;
 import com.godrej.surveys.service.ProjectService;
 import com.godrej.surveys.sitevisit.dao.SiteVisitSurveyRequestDao;
 import com.godrej.surveys.sitevisit.dto.SiteVisitSurveyContactDto;
+import com.godrej.surveys.sitevisit.dto.SiteVisitSurveyExcelHelper;
 import com.godrej.surveys.sitevisit.dto.SiteVisitSurveyReminderContactDto;
 import com.godrej.surveys.sitevisit.dto.SiteVisitSurveyReminderResponseDto;
 import com.godrej.surveys.sitevisit.dto.SiteVisitSurveyReminderResponseWrapperDto;
@@ -55,6 +57,9 @@ public class SiteVisitSurveyServiceImpl implements SiteVisitSurveyService {
 	@Autowired
 	private ContactLogDao contactLogDao;
 
+	@Autowired
+	private SpringSftpController springSftpController;
+	
 	@Override
 	public List<SiteVisitSurveyContactDto> getContacts(String projectSfid, String fromDate, String toDate) {
 
@@ -87,7 +92,7 @@ public class SiteVisitSurveyServiceImpl implements SiteVisitSurveyService {
 	}
 
 	@Override
-	public ResponseDto sendSurvey(String projectSfid, String fromDate, String toDate) {
+	public ResponseDto sendSurvey(String projectSfid, String fromDate, String toDate, String instanceId) {
 		ProjectDto project = projectDao.getProject(projectSfid);
 
 		String preSurveyId= "6415590";
@@ -106,7 +111,7 @@ public class SiteVisitSurveyServiceImpl implements SiteVisitSurveyService {
 		String transactionDate = dateUtil.getCurrentDate("dd/MM/yyyy");
 		project.setTransactionDate(transactionDate);
 		project.setSurveyId(preSurveyId);
-		String instanceId = "SV_"+ Calendar.getInstance().getTimeInMillis();
+		//String instanceId = "SV_"+ Calendar.getInstance().getTimeInMillis();
 		project.setInstanceId(instanceId);		
 		Integer parkedRecords = surveyRequestDao.parkRecords(project);
 		Integer repeated = contactLogDao.markDuplicate(project);
@@ -118,11 +123,42 @@ public class SiteVisitSurveyServiceImpl implements SiteVisitSurveyService {
 		List<SiteVisitSurveyContactDto> contacts = new ArrayList<>(surveyRequestDao.getContacts(project));
 		ResponseDto response =  processSurvey(contacts, project);
 		
-		/*
-		 * try { surveyRequestDao.clearExtraUpdate(project); }catch (Exception e) {
-		 * log.error(e.getMessage() ,e); }
-		 */
+		springSftpController.sftpcon("D:\\Satheesh\\Projects\\Litmus World\\SiteVisit\\"+instanceId+".csv",AppConstants.LW_SITEVIST_SURVEY_FOLDER_PATH);
 		return response;
+	}
+	
+	@Override
+	public List<SiteVisitSurveyContactDto> sendSurveyWithScheduler(String projectSfid, String fromDate, String toDate, String instanceId) {
+		ProjectDto project = projectDao.getProject(projectSfid);
+
+		String preSurveyId= "6415590";
+		if (project == null) {
+
+			StringBuilder errorMsg = new StringBuilder("No project found for sfid - ");
+			errorMsg.append(projectSfid);
+			if(log.isInfoEnabled()){
+				log.error(errorMsg.toString());
+			}
+			return null;
+		}
+		project.setFromDate(fromDate);
+		project.setToDate(toDate);
+		project.setViewOnly("N");
+		String transactionDate = dateUtil.getCurrentDate("dd/MM/yyyy");
+		project.setTransactionDate(transactionDate);
+		project.setSurveyId(preSurveyId);
+		//String instanceId = "SV_"+ Calendar.getInstance().getTimeInMillis();
+		project.setInstanceId(instanceId);		
+		Integer parkedRecords = surveyRequestDao.parkRecords(project);
+		Integer repeated = contactLogDao.markDuplicate(project);
+		StringBuilder countLog = new StringBuilder();
+		countLog.append("Parked Records count - ").append(parkedRecords)
+		.append(" Repeated Record count - ").append(repeated);
+		log.info(countLog.toString());
+
+		List<SiteVisitSurveyContactDto> contacts = new ArrayList<>(surveyRequestDao.getContacts(project));
+		ResponseDto response =  processSurveyWithScheduler(contacts, project);
+		return contacts;
 	}
 	
 	@SuppressWarnings("unused")
@@ -166,48 +202,44 @@ public class SiteVisitSurveyServiceImpl implements SiteVisitSurveyService {
 		if (CommonUtil.isCollectionEmpty(contacts)) {
 			return new ResponseDto(true, "No contact for project ");
 		}
-		ResponseDto response = new ResponseDto(false, "");
-		int pageSize = AppConstants.SURVEY_API_PAGE_SIZE;
 		int totalImportCount = 0;
-		if (contacts.size() <= pageSize) {
-			ResponseDto responseChunck = rmSurveyAPI.post(contacts);
-			if(responseChunck !=null && !responseChunck.isHasError()) {
-				totalImportCount = getImportCount(responseChunck);
-				response.addData("importCount", Integer.valueOf(totalImportCount));
-				updateContactLogs(contacts, instanceId);
-			}
-			return response;
-		}
-
-		int totalContacts = contacts.size();
-		int pages = totalContacts / pageSize;
-		int mod = totalContacts % pageSize;
-		if (mod > 0) {
-			pages = pages + 1;
-		}
-		int startIndex = 0;
-		int endIndex = 0;
-
-		for (int i = 1; i <= pages; i++) {
-			if (i == pages) {
-				endIndex = ((i - 1) * pageSize + mod);
-				log.info("Last Page");
-			} else {
-				endIndex = i * pageSize;
-			}
-			List<SiteVisitSurveyContactDto> contactChunck = contacts.subList(startIndex, endIndex);
-
-			ResponseDto responseChunck = rmSurveyAPI.post(contactChunck);
-			if(responseChunck !=null && !responseChunck.isHasError()) {
-				totalImportCount = totalImportCount + getImportCount(responseChunck);
-				response.addData("importCount", Integer.valueOf(totalImportCount));
-				updateContactLogs(contactChunck, instanceId);
-			}
-			startIndex = i * pageSize;
+		ResponseDto response = new ResponseDto(false, "");
+		updateContactLogs(contacts, instanceId);
+		SiteVisitSurveyExcelHelper excelHelper = new SiteVisitSurveyExcelHelper();
+		try {
+			excelHelper.tutorialsToExcel(contacts,instanceId);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 		return response;
 	}
+	
+	private ResponseDto processSurveyWithScheduler(List<SiteVisitSurveyContactDto> contacts, ProjectDto project) {
+		ResponseDto response = processSurveyWithScheduler(contacts, project.getInstanceId());
+		Integer statusUpdateCount = updateStatus(project);
+		response.addData("statusUpdateCount", statusUpdateCount);
+		return response;
 
+	}
+
+	private ResponseDto processSurveyWithScheduler(List<SiteVisitSurveyContactDto> contacts, String instanceId) {
+
+		if (CommonUtil.isCollectionEmpty(contacts)) {
+			return new ResponseDto(true, "No contact for project ");
+		}
+		int totalImportCount = 0;
+		ResponseDto response = new ResponseDto(false, "");
+		updateContactLogs(contacts, instanceId);
+		SiteVisitSurveyExcelHelper excelHelper = new SiteVisitSurveyExcelHelper();
+		try {
+			excelHelper.tutorialsToExcel(contacts,instanceId);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return response;
+	}
 	private Integer updateContactLogs(List<SiteVisitSurveyContactDto> contactChunck, String instanceId) {
 		String[] bookings = contactChunck.stream().map(contact -> contact.getName()).collect(Collectors.toList())
 				.toArray(new String[0]);

@@ -5,7 +5,7 @@ import com.godrej.surveys.dto.BaseDto;
 
 /**
  * Contact details of RM Survey
- * @author Vivek Birdi
+ * @author Satheesh Kyahtam
  *
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -17,33 +17,36 @@ public class HandoverSurveyContactDto extends BaseDto{
 	private static final long serialVersionUID = 2165045093833715656L;
 	private String firstName;
 	private String lastName;
-	private String mobile;
+	private String user_phone;
 	private String segmentCode;
 	private String transactionDate; // format dd/mm/yyyy
-	private String email;
-	private String field20;
+	private String user_email;
+	private String tag_field20;
 	private String name;
 	private String bookingDate;
-	private String field1;
-	private String field15;
+	private String tag_field1;
+	private String tag_field15;
 	private String sentDate;
 	private boolean sentStatus;
 	
-	private String field2;
-	private String field4;
-	private String field6;
-	private String field8;
-	private String field9;
-	private String field11;
-	private String field13;
-	private String field14;
-	private String field16;
+	private String tag_field2;
+	private String tag_field4;
+	private String tag_field6;
+	private String tag_field8;
+	private String tag_field9;
+	private String tag_field11;
+	private String tag_field13;
+	private String tag_field14;
+	private String tag_field16;
 	private String surveyType;
 	private String propertyName;
 	private String projectName;
-	private String field3;
-	private String field10;
-	private String field18;
+	private String tag_field3;
+	private String tag_field10;
+	private String tag_field18;
+	
+	
+	
 	
 	public String getFirstName() {
 		return firstName;
@@ -57,11 +60,11 @@ public class HandoverSurveyContactDto extends BaseDto{
 	public void setLastName(String lastName) {
 		this.lastName = lastName;
 	}
-	public String getMobile() {
-		return mobile;
+	public String getUser_phone() {
+		return user_phone;
 	}
-	public void setMobile(String mobile) {
-		this.mobile = mobile;
+	public void setUser_phone(String user_phone) {
+		this.user_phone = user_phone;
 	}
 	public String getSegmentCode() {
 		return segmentCode;
@@ -75,17 +78,17 @@ public class HandoverSurveyContactDto extends BaseDto{
 	public void setTransactionDate(String transactionDate) {
 		this.transactionDate = transactionDate;
 	}
-	public String getEmail() {
-		return email;
+	public String getUser_email() {
+		return user_email;
 	}
-	public void setEmail(String email) {
-		this.email = email;
+	public void setUser_email(String user_email) {
+		this.user_email = user_email;
 	}
-	public String getField20() {
-		return field20;
+	public String getTag_field20() {
+		return tag_field20;
 	}
-	public void setField20(String field20) {
-		this.field20 = field20;
+	public void setTag_field20(String tag_field20) {
+		this.tag_field20 = tag_field20;
 	}
 	public String getName() {
 		return name;
@@ -99,17 +102,17 @@ public class HandoverSurveyContactDto extends BaseDto{
 	public void setBookingDate(String bookingDate) {
 		this.bookingDate = bookingDate;
 	}
-	public String getField1() {
-		return field1;
+	public String getTag_field1() {
+		return tag_field1;
 	}
-	public void setField1(String field1) {
-		this.field1 = field1;
+	public void setTag_field1(String tag_field1) {
+		this.tag_field1 = tag_field1;
 	}
-	public String getField15() {
-		return field15;
+	public String getTag_field15() {
+		return tag_field15;
 	}
-	public void setField15(String field15) {
-		this.field15 = field15;
+	public void setTag_field15(String tag_field15) {
+		this.tag_field15 = tag_field15;
 	}
 	public String getSentDate() {
 		return sentDate;
@@ -123,79 +126,60 @@ public class HandoverSurveyContactDto extends BaseDto{
 	public void setSentStatus(boolean sentStatus) {
 		this.sentStatus = sentStatus;
 	}
-	public String getField2() {
-		return field2;
+	public String getTag_field2() {
+		return tag_field2;
 	}
-
-	public void setField2(String field2) {
-		this.field2 = field2;
+	public void setTag_field2(String tag_field2) {
+		this.tag_field2 = tag_field2;
 	}
-
-	public String getField4() {
-		return field4;
+	public String getTag_field4() {
+		return tag_field4;
 	}
-
-	public void setField4(String field4) {
-		this.field4 = field4;
+	public void setTag_field4(String tag_field4) {
+		this.tag_field4 = tag_field4;
 	}
-
-	public String getField6() {
-		return field6;
+	public String getTag_field6() {
+		return tag_field6;
 	}
-
-	public void setField6(String field6) {
-		this.field6 = field6;
+	public void setTag_field6(String tag_field6) {
+		this.tag_field6 = tag_field6;
 	}
-
-	public String getField8() {
-		return field8;
+	public String getTag_field8() {
+		return tag_field8;
 	}
-
-	public void setField8(String field8) {
-		this.field8 = field8;
+	public void setTag_field8(String tag_field8) {
+		this.tag_field8 = tag_field8;
 	}
-
-	public String getField9() {
-		return field9;
+	public String getTag_field9() {
+		return tag_field9;
 	}
-
-	public void setField9(String field9) {
-		this.field9 = field9;
+	public void setTag_field9(String tag_field9) {
+		this.tag_field9 = tag_field9;
 	}
-
-	public String getField11() {
-		return field11;
+	public String getTag_field11() {
+		return tag_field11;
 	}
-
-	public void setField11(String field11) {
-		this.field11 = field11;
+	public void setTag_field11(String tag_field11) {
+		this.tag_field11 = tag_field11;
 	}
-
-	public String getField13() {
-		return field13;
+	public String getTag_field13() {
+		return tag_field13;
 	}
-
-	public void setField13(String field13) {
-		this.field13 = field13;
+	public void setTag_field13(String tag_field13) {
+		this.tag_field13 = tag_field13;
 	}
-
-	public String getField14() {
-		return field14;
+	public String getTag_field14() {
+		return tag_field14;
 	}
-
-	public void setField14(String field14) {
-		this.field14 = field14;
+	public void setTag_field14(String tag_field14) {
+		this.tag_field14 = tag_field14;
 	}
-
-	public String getField16() {
-		return field16;
+	public String getTag_field16() {
+		return tag_field16;
 	}
-
-	public void setField16(String field16) {
-		this.field16 = field16;
+	public void setTag_field16(String tag_field16) {
+		this.tag_field16 = tag_field16;
 	}
- 
-	
 	public String getSurveyType() {
 		return surveyType;
 	}
@@ -213,30 +197,30 @@ public class HandoverSurveyContactDto extends BaseDto{
 	}
 	public void setProjectName(String projectName) {
 		this.projectName = projectName;
-	}	
-	public String getField3() {
-		return field3;
 	}
-	public void setField3(String field3) {
-		this.field3 = field3;
+	public String getTag_field3() {
+		return tag_field3;
 	}
-	public String getField10() {
-		return field10;
+	public void setTag_field3(String tag_field3) {
+		this.tag_field3 = tag_field3;
 	}
-	public void setField10(String field10) {
-		this.field10 = field10;
+	public String getTag_field10() {
+		return tag_field10;
 	}
-	public String getField18() {
-		return field18;
+	public void setTag_field10(String tag_field10) {
+		this.tag_field10 = tag_field10;
 	}
-	public void setField18(String field18) {
-		this.field18 = field18;
+	public String getTag_field18() {
+		return tag_field18;
+	}
+	public void setTag_field18(String tag_field18) {
+		this.tag_field18 = tag_field18;
 	}
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((email == null) ? 0 : email.hashCode());
+		result = prime * result + ((user_email == null) ? 0 : user_email.hashCode());
 		return result;
 	}
 	@Override
@@ -248,10 +232,10 @@ public class HandoverSurveyContactDto extends BaseDto{
 		if (getClass() != obj.getClass())
 			return false;
 		HandoverSurveyContactDto other = (HandoverSurveyContactDto) obj;
-		if (email == null) {
-			if (other.email != null)
+		if (user_email == null) {
+			if (other.user_email != null)
 				return false;
-		} else if (!email.equals(other.email))
+		} else if (!user_email.equals(other.user_email))
 			return false;
 		return true;
 	}

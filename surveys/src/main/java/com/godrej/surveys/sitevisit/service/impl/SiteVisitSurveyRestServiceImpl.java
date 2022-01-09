@@ -122,8 +122,8 @@ public class SiteVisitSurveyRestServiceImpl implements SiteVisitSurveyAPIService
 		request.setSmsTemplateID(SMS_TEMPLATE_ID);
 
 		SiteVisitSurveyContactDto contact = new SiteVisitSurveyContactDto();
-		contact.setEmail("vivekbirdi@gmail.com");
-		contact.setMobile("917738915689");
+		contact.setUser_email("vivekbirdi@gmail.com");
+		contact.setUser_phone("917738915689");
 		contact.setFirstName("Vivek");
 		contact.setLastName("Birdi");
 		contact.setSegmentCode("S90");

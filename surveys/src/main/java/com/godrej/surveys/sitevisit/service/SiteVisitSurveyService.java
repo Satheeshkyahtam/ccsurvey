@@ -16,7 +16,9 @@ public interface SiteVisitSurveyService {
 
 	public Set<SiteVisitSurveyReminderContactDto> getContactsForSecondReminder(ProjectDto project);
 
-	public ResponseDto sendSurvey(String projectSfid, String fromDate, String toDate);
+	public ResponseDto sendSurvey(String projectSfid, String fromDate, String toDate, String instanceId);
+	
+	public List<SiteVisitSurveyContactDto> sendSurveyWithScheduler(String projectSfid, String fromDate, String toDate, String instanceId);
 
 	public ResponseDto sendReminder(ProjectDto project);
 

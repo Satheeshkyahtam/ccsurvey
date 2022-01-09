@@ -121,8 +121,8 @@ public class HandoverSurveyRestServiceImpl implements HandoverSurveyAPIService {
 		request.setSmsTemplateID(SMS_TEMPLATE_ID);
 
 		HandoverSurveyContactDto contact = new HandoverSurveyContactDto();
-		contact.setEmail("vivekbirdi@gmail.com");
-		contact.setMobile("917738915689");
+		contact.setUser_email("vivekbirdi@gmail.com");
+		contact.setUser_phone("917738915689");
 		contact.setFirstName("Vivek");
 		contact.setLastName("Birdi");
 		contact.setSegmentCode("S90");

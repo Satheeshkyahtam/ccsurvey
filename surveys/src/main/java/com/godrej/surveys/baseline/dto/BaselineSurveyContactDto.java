@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.godrej.surveys.dto.BaseDto;
 /**
  * Contact details of RM Survey
- * @author Vivek Birdi
+ * @author Satheesh Kyatham
  *
  */
 @JsonIgnoreProperties(ignoreUnknown = true)

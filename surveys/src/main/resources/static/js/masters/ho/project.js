@@ -38,10 +38,10 @@ function onChangeRegion(){
 }
 
 /*Added by A*/
-function HOgetProjectList(region){
+/*function HOgetProjectList(region){
 	var url = ctx+"/getHOProjectList?region="+region;
 	submitToURL(url,"HOpopulateProjects");
-}
+}*/
 /* END Added by A*/
 
 function getProjectList(region){

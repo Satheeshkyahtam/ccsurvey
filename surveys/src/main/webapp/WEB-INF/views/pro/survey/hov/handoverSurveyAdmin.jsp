@@ -80,7 +80,7 @@
 		<div role="tabpanel" class="tab-pane active" id="home">
 			<div class="filterColBg">
 				<div class="filterCol">
-				  <%-- <div class="form-group col-md-2">
+				  <div class="form-group col-md-2">
 					<label >Region</label>
 					<select class="form-control input-sm" name="region" id="regionList">
 					<option selected value="0">Choose Region</option>
@@ -88,7 +88,7 @@
 						<option value="${region}">${region}</option>
 					</c:forEach>
 					</select>
-				  </div> --%>
+				  </div>
 				  
 				<%-- <div class="form-group col-md-2">
 					<label >Region</label>
@@ -107,9 +107,15 @@
 					</select>	
 				</div> -->
 				  
-				  <div class="form-group col-md-2">
+				  <!-- <div class="form-group col-md-2">
 					<label >Projects</label>
 					<select class="form-control input-sm multiselectDD" name="projectSfid" id="projectList" multiple="multiple" style="height:34px;   ">				
+					</select>
+				  </div> -->
+				  
+				  <div class="form-group col-md-2">
+					<label >Projects</label>
+					<select class="form-control input-sm" name="projectSfid" id="projectList">				
 					</select>
 				  </div>
 				  <div class="form-group col-md-2">

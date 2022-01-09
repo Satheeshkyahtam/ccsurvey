@@ -32,7 +32,7 @@ public interface ProjectDao {
 	public ProjectDto getProject(String projectSfid);
 	
 	@Select("Select name,sfid,propstrength__project_code__c as segmentCode, region__c as region  FROM " + 
-			//"salesforce.propstrength__projects__c WHERE sfid in ( 'a1l6F000008fqcuQAA')")
+//			"salesforce.propstrength__projects__c WHERE sfid in ( 'a1l6F000008DnniQAC')"
 			" salesforce.propstrength__projects__c WHERE sfid not in ( 'a1l6F000008DnniQAC','a1l6F000008fqcuQAA','a1l6F000002dTpoQAE')"
 			+ " ${dateWhereCondition} "
 			+ " ORDER BY name ASC")

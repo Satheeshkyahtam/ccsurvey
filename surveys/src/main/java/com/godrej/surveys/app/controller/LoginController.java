@@ -36,7 +36,8 @@ public class LoginController {
 		ResponseDto response = null;
 		if(dto.getEmail().equals("shruti.tawade@litmusworld.com") || dto.getEmail().equals("prakash.idnani@godrejproperties.com") || dto.getEmail().equals("sparikh@godrejproperties.com") || dto.getEmail().equals("rajesh.gupta@godrejproperties.com") 
 				|| dto.getEmail().equals("prashant.jain@godrejinds.com") || dto.getEmail().equals("ve.swaminathan@godrejinds.com") 
-				|| dto.getEmail().equals("sathish.kyatham@godrejinds.com") || dto.getEmail().equals("vineet.bhardwaj@godrejproperties.com") || dto.getEmail().equals("sachin.suryavanshi@godrejproperties.com"))
+				|| dto.getEmail().equals("sathish.kyatham@godrejinds.com") || dto.getEmail().equals("vineet.bhardwaj@godrejproperties.com") 
+				|| dto.getEmail().equals("sachin.suryavanshi@godrejproperties.com") || dto.getEmail().equals("sourabh.sharma@godrejproperties.com"))
 		{
 			String ccsurveysEmailID = "shruti.tawade@litmusworld.com";
 			String ccsurveysPass = "ccsurvey@2021";

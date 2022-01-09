@@ -20,6 +20,7 @@ import com.godrej.surveys.dto.ProjectDto;
 import com.godrej.surveys.dto.ResponseDto;
 import com.godrej.surveys.handover.dao.HandoverSurveyRequestDao;
 import com.godrej.surveys.handover.dto.HandoverSurveyContactDto;
+import com.godrej.surveys.handover.dto.HandoverSurveyExcelHelper;
 import com.godrej.surveys.handover.dto.HandoverSurveyReminderContactDto;
 import com.godrej.surveys.handover.dto.HandoverSurveyReminderResponseDto;
 import com.godrej.surveys.handover.dto.HandoverSurveyReminderResponseWrapperDto;
@@ -27,6 +28,7 @@ import com.godrej.surveys.handover.dto.HandoverSurveyResponseDto;
 import com.godrej.surveys.handover.dto.HandoverSurveyResponseWrapperDto;
 import com.godrej.surveys.handover.service.HandoverSurveyAPIService;
 import com.godrej.surveys.handover.service.HandoverSurveyService;
+import com.godrej.surveys.onboarding.controller.SpringSftpController;
 import com.godrej.surveys.service.ProjectService;
 import com.godrej.surveys.util.AppConstants;
 import com.godrej.surveys.util.CommonUtil;
@@ -54,20 +56,28 @@ public class HandoverSurveyServiceImpl implements HandoverSurveyService {
 	
 	@Autowired
 	private ContactLogDao contactLogDao;
+	
+	@Autowired
+	private SpringSftpController springSftpController;
 
 	@Override
 	public List<HandoverSurveyContactDto> getContacts(String projectSfid, String fromDate, String toDate) {
 		
-		/* Added by A */
+		ProjectDto project = projectService.getProject(projectSfid);
+		if (project == null) {
+			return new ArrayList<>();
+		}
 		try {
-			if (projectSfid != null && !projectSfid.equals("null") && !projectSfid.equals("")) {
+			/* Added By Atul */
+			/* Commented By Satheesh */
+			/*if (projectSfid != null && !projectSfid.equals("null") && !projectSfid.equals("")) {
 				String [] mf= projectSfid.split(",");
 				ArrayList<HandoverSurveyContactDto> data=new ArrayList<HandoverSurveyContactDto>();
 				
 				for (int i=0;i<mf.length;i++){
 					ProjectDto project = projectService.getProject(mf[i]);
 					
-					if (project != null) {
+					if (project != null) {*/
 						project.setFromDate(fromDate);
 						project.setToDate(toDate);
 						project.setViewOnly("Y");
@@ -83,13 +93,14 @@ public class HandoverSurveyServiceImpl implements HandoverSurveyService {
 						.append(" Repeated Record count - ").append(repeated);
 						log.info(countLog.toString());
 						
-						data.addAll(surveyRequestDao.getContacts(project));
-					}  
+						//data.addAll(surveyRequestDao.getContacts(project));
+						return new ArrayList<>(surveyRequestDao.getContacts(project));
+					/*}  
 				}
 				return data;
 			} else {
 				return new ArrayList<>();
-			}
+			}*/
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 		} 
@@ -136,7 +147,7 @@ public class HandoverSurveyServiceImpl implements HandoverSurveyService {
 	}
 
 	@Override
-	public ResponseDto sendSurvey(String projectSfid, String fromDate, String toDate) {
+	public ResponseDto sendSurvey(String projectSfid, String fromDate, String toDate,String instanceId) {
 		ProjectDto project = projectDao.getProject(projectSfid);
 
 		String preSurveyId= "6119246";
@@ -155,7 +166,7 @@ public class HandoverSurveyServiceImpl implements HandoverSurveyService {
 		String transactionDate = dateUtil.getCurrentDate("dd/MM/yyyy");
 		project.setTransactionDate(transactionDate);
 		project.setSurveyId(preSurveyId);
-		String instanceId = "Handover_"+ Calendar.getInstance().getTimeInMillis();
+		//String instanceId = "Handover_"+ Calendar.getInstance().getTimeInMillis();
 		project.setInstanceId(instanceId);		
 		Integer parkedRecords = surveyRequestDao.parkRecords(project);
 		Integer repeated = contactLogDao.markDuplicate(project);
@@ -165,11 +176,43 @@ public class HandoverSurveyServiceImpl implements HandoverSurveyService {
 		log.info(countLog.toString());
 		List<HandoverSurveyContactDto> contacts = new ArrayList<>(surveyRequestDao.getContacts(project));
 		ResponseDto response =  processSurvey(contacts, project);		
-		/*
-		 * try { surveyRequestDao.clearExtraUpdate(project); }catch (Exception e) {
-		 * log.error(e.getMessage() ,e); }
-		 */
+		
+		springSftpController.sftpcon("D:\\Satheesh\\Projects\\Litmus World\\Handover\\"+instanceId+".csv",AppConstants.LW_HANDOVER_SURVEY_FOLDER_PATH);
 		return response;
+	}
+	
+	@Override
+	public List<HandoverSurveyContactDto> sendSurveyWithScheduler(String projectSfid, String fromDate, String toDate,String instanceId) {
+		ProjectDto project = projectDao.getProject(projectSfid);
+
+		String preSurveyId= "6119246";
+		if (project == null) {
+
+			StringBuilder errorMsg = new StringBuilder("No project found for sfid - ");
+			errorMsg.append(projectSfid);
+			if(log.isInfoEnabled()) {
+				log.error(errorMsg.toString());
+			}
+			return null;
+		}
+		project.setFromDate(fromDate);
+		project.setToDate(toDate);
+		project.setViewOnly("N");
+		String transactionDate = dateUtil.getCurrentDate("dd/MM/yyyy");
+		project.setTransactionDate(transactionDate);
+		project.setSurveyId(preSurveyId);
+		//String instanceId = "Handover_"+ Calendar.getInstance().getTimeInMillis();
+		project.setInstanceId(instanceId);		
+		Integer parkedRecords = surveyRequestDao.parkRecords(project);
+		Integer repeated = contactLogDao.markDuplicate(project);
+		StringBuilder countLog = new StringBuilder();
+		countLog.append("Parked Records count - ").append(parkedRecords)
+		.append(" Repeated Record count - ").append(repeated);
+		log.info(countLog.toString());
+		List<HandoverSurveyContactDto> contacts = new ArrayList<>(surveyRequestDao.getContacts(project));
+		ResponseDto response =  processSurveyWithScheduler(contacts, project);		
+		
+		return contacts;
 	}
 	
 	@SuppressWarnings("unused")
@@ -207,50 +250,47 @@ public class HandoverSurveyServiceImpl implements HandoverSurveyService {
 		return response;
 
 	}
+	
+	private ResponseDto processSurveyWithScheduler(List<HandoverSurveyContactDto> contacts, ProjectDto project) {
+		ResponseDto response = processSurveyWithScheduler(contacts,project.getInstanceId());
+		Integer statusUpdateCount = updateStatus(project);
+		response.addData("statusUpdateCount", statusUpdateCount);
+		return response;
+
+	}
 
 	private ResponseDto processSurvey(List<HandoverSurveyContactDto> contacts, String instanceId) {
 
 		if (CommonUtil.isCollectionEmpty(contacts)) {
 			return new ResponseDto(true, "No contact for project ");
 		}
-		ResponseDto response = new ResponseDto(false, "");
-		int pageSize = AppConstants.SURVEY_API_PAGE_SIZE;
 		int totalImportCount = 0;
-		if (contacts.size() <= pageSize) {
-			ResponseDto responseChunck = rmSurveyAPI.post(contacts);
-			if(responseChunck !=null && !responseChunck.isHasError()) {
-				totalImportCount = getImportCount(responseChunck);
-				response.addData("importCount", Integer.valueOf(totalImportCount));
-				updateContactLogs(contacts, instanceId);
-			}
-			return response;
+		ResponseDto response = new ResponseDto(false, "");
+		updateContactLogs(contacts, instanceId);
+		HandoverSurveyExcelHelper excelHelper = new HandoverSurveyExcelHelper();
+		try {
+			excelHelper.tutorialsToExcel(contacts,instanceId);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
+		return response;
+	}
+	
+	private ResponseDto processSurveyWithScheduler(List<HandoverSurveyContactDto> contacts, String instanceId) {
 
-		int totalContacts = contacts.size();
-		int pages = totalContacts / pageSize;
-		int mod = totalContacts % pageSize;
-		if (mod > 0) {
-			pages = pages + 1;
+		if (CommonUtil.isCollectionEmpty(contacts)) {
+			return new ResponseDto(true, "No contact for project ");
 		}
-		int startIndex = 0;
-		int endIndex = 0;
-
-		for (int i = 1; i <= pages; i++) {
-			if (i == pages) {
-				endIndex = ((i - 1) * pageSize + mod);
-				log.info("Last Page");
-			} else {
-				endIndex = i * pageSize;
-			}
-			List<HandoverSurveyContactDto> contactChunck = contacts.subList(startIndex, endIndex);
-
-			ResponseDto responseChunck = rmSurveyAPI.post(contactChunck);
-			if(responseChunck !=null && !responseChunck.isHasError()) {
-				totalImportCount = totalImportCount + getImportCount(responseChunck);
-				response.addData("importCount", Integer.valueOf(totalImportCount));
-				updateContactLogs(contactChunck, instanceId);
-			}
-			startIndex = i * pageSize;
+		int totalImportCount = 0;
+		ResponseDto response = new ResponseDto(false, "");
+		updateContactLogs(contacts, instanceId);
+		HandoverSurveyExcelHelper excelHelper = new HandoverSurveyExcelHelper();
+		try {
+			excelHelper.tutorialsToExcel(contacts,instanceId);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 		return response;
 	}
